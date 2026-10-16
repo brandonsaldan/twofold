@@ -1,3 +1,8 @@
-.next
 node_modules
 .DS_Store
+data/raw
+dist
+.astro
+.vercel
+playwright-report
+test-results

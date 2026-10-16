@@ -1,0 +1,53 @@
+{
+  "pagesFetched": 220034,
+  "pagesFetchedUnique": 220030,
+  "pagesExpected": 220052,
+  "categoriesEnumerated": 25,
+  "chipCategories": 19,
+  "internalSnpIds": 2851,
+  "pageBatches": 4402,
+  "pagesMissingRevision": 21,
+  "topicPages": 2957,
+  "snpsParsed": 111734,
+  "syntheticSnps": 10,
+  "canonicalDerived": 11992,
+  "genotypesParsed": 104732,
+  "genosetsParsed": 283,
+  "genosetCriteriaFunctions": {
+    "and": 1010,
+    "or": 174,
+    "not": 60,
+    "atleast": 37
+  },
+  "genosetEvaluationFailures": {
+    "Gs118": "Error: Criteria page unavailable",
+    "Gs188": "Error: Criteria page unavailable",
+    "Gs189": "Error: Criteria page unavailable",
+    "Gs2301": "Error: Criteria page unavailable",
+    "Gs2302": "Error: Criteria page unavailable",
+    "Gs2303": "Error: Criteria page unavailable",
+    "Gs2304": "Error: Criteria page unavailable",
+    "Gs2305": "Error: Criteria page unavailable",
+    "Gs240": "Error: Criteria page unavailable",
+    "Gs260": "Error: Criteria page unavailable",
+    "Gs294": "Error: Criteria page unavailable",
+    "Gs300": "Error: Criteria page unavailable",
+    "Gs301": "Error: Criteria page unavailable",
+    "Gs302": "Error: Criteria page unavailable",
+    "Gs304": "Error: Criteria page unavailable",
+    "Gs318": "Error: Criteria page unavailable",
+    "Gs319": "Error: Criteria page unavailable",
+    "Gs321": "Error: Criteria page unavailable",
+    "Gs322": "Error: Criteria page unavailable",
+    "Gs323": "Error: Criteria page unavailable",
+    "Gs324": "Error: Criteria page unavailable"
+  },
+  "failures": {
+    "SNP template missing or malformed": 2,
+    "genotype template missing or malformed": 73,
+    "missing revision": 21,
+    "genoset criteria missing": 21
+  },
+  "coreGzipBytes": 3552314,
+  "textGzipBytes": 4743784
+}
