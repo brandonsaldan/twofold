@@ -63,7 +63,7 @@ export default function Landing({ datasetError, saved, onFile, onSample, onUnloc
           <h1>Read the rest of your DNA test.</h1>
           <p className="lede">Twofold reads your DNA test's raw data and explains what it says about your susceptibility to health conditions, response to medicines, and traits from metabolism to personality.</p>
           <ul className="hero-facts">
-            <li><span>Free and <a className="hero-link" href="https://github.com/brandonsaldan/codex">open source</a></span></li>
+            <li><span>Free and <a className="hero-link" href="https://github.com/brandonsaldan/twofold">open source</a></span></li>
             <li>No account needed</li>
             <li>Nothing leaves your device</li>
           </ul>

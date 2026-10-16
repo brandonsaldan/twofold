@@ -1,10 +1,8 @@
 <h1 align="center">
   <br>
   <a href="https://twofold.brandonsaldan.com">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="public/mark-dark.svg">
-      <img src="public/mark.svg" alt="Twofold" width="88">
-    </picture>
+    <img src="public/mark.svg#gh-light-mode-only" alt="Twofold" width="88">
+    <img src="public/mark-dark.svg#gh-dark-mode-only" alt="Twofold" width="88">
   </a>
   <br>
   Twofold

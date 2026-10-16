@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 const root = new URL('../data/raw/', import.meta.url)
 const endpoint = 'https://bots.snpedia.com/api.php'
-const userAgent = 'Twofold/0.1 (https://github.com/brandonsaldan/codex; public SNPedia snapshot builder)'
+const userAgent = 'Twofold/0.1 (https://github.com/brandonsaldan/twofold; public SNPedia snapshot builder)'
 const refresh = process.argv.includes('--refresh') || process.argv.includes('--refresh-categories')
 const refreshCategories = process.argv.includes('--refresh-categories')
 const baseCategories = [
