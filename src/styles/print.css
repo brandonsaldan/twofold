@@ -1,0 +1,161 @@
+@media screen {
+  .print-root {
+    display: none;
+  }
+}
+
+@page {
+  margin: 16mm 14mm 18mm;
+
+  @bottom-right {
+    content: 'Page ' counter(page) ' of ' counter(pages);
+    font-family: 'Schibsted Grotesk', Arial, sans-serif;
+    font-size: 8pt;
+    color: #555;
+  }
+
+  @bottom-left {
+    content: 'Twofold report';
+    font-family: 'Schibsted Grotesk', Arial, sans-serif;
+    font-size: 8pt;
+    color: #555;
+  }
+}
+
+@media print {
+  :root {
+    --paper: #fff;
+    --surface: #fff;
+    --ink: #000;
+    --muted: #444;
+    --rule: #ccc;
+  }
+
+  html,
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10pt;
+  }
+
+  body:has(> .print-root) > *:not(.print-root) {
+    display: none !important;
+  }
+
+  .site-header .nav,
+  .site-footer,
+  .skip-link,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  .print-root {
+    display: block;
+    font-family: var(--sans);
+    color: #000;
+  }
+
+  .print-cover {
+    margin-bottom: 10mm;
+    padding-bottom: 6mm;
+    border-bottom: 1px solid #000;
+  }
+
+  .print-brand {
+    margin: 0 0 8mm;
+    font-family: var(--serif);
+    font-size: 14pt;
+    letter-spacing: -0.03em;
+  }
+
+  .print-cover h1 {
+    margin: 0 0 6mm;
+    font-family: var(--serif);
+    font-size: 28pt;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .print-facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3mm 8mm;
+    margin: 0 0 6mm;
+  }
+
+  .print-facts dt {
+    color: #555;
+    font-size: 8pt;
+  }
+
+  .print-facts dd {
+    margin: 0;
+    font-size: 9.5pt;
+  }
+
+  .print-note {
+    margin: 0;
+    color: #333;
+    font-size: 8.5pt;
+    line-height: 1.45;
+  }
+
+  .print-section {
+    margin-bottom: 8mm;
+  }
+
+  .print-section h2 {
+    margin: 0 0 3mm;
+    font-family: var(--serif);
+    font-size: 15pt;
+    font-weight: 500;
+    break-after: avoid;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+
+  .print-table thead {
+    display: table-header-group;
+  }
+
+  .print-table th {
+    padding: 2mm 2mm 2mm 0;
+    border-bottom: 1px solid #000;
+    color: #444;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  .print-table td {
+    padding: 2mm 2mm 2mm 0;
+    border-bottom: 0.5pt solid #bbb;
+    vertical-align: top;
+  }
+
+  .print-table tr {
+    break-inside: avoid;
+  }
+
+  .print-table td:first-child {
+    width: 10mm;
+    font-family: var(--mono);
+  }
+
+  .print-table td:nth-child(2) {
+    width: 30mm;
+  }
+
+  .print-foot {
+    margin-top: 6mm;
+    color: #555;
+    font-size: 8pt;
+  }
+
+  .page h2 {
+    break-after: avoid;
+  }
+}

@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro'
+---
+<Base title="Get your raw DNA data | Twofold" description="How to download your raw DNA data file from 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA, Living DNA and whole genome sequencing services.">
+  <main class="page" id="main">
+    <h1>Get your raw data</h1>
+    <p class="lede">Twofold reads the raw DNA file that your testing service lets you download. Here is where to find it for each service.</p>
+    <p class="note">Choose the file itself, including a ZIP or GZ archive. Twofold reads common 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA, Living DNA and VCF formats. A provider may change its download steps or file format, so use its current help page if the menu looks different.</p>
+    <h2 id="23andme">23andMe</h2>
+    <p>In your account, request your raw genetic data from the settings or raw data page. 23andMe sends an email when the download is ready. The file is generally a ZIP containing text data. <a href="https://customercare.23andme.com/hc/en-us/articles/212196868-Accessing-Your-Raw-Genetic-Data">23andMe download instructions</a>.</p>
+    <h2 id="ancestrydna">AncestryDNA</h2>
+    <p>Open DNA Settings for your test, then choose Download DNA Data under Download or delete. Ancestry provides a text file. <a href="https://help.ancestry.com/hc/en-us/articles/53933317283603-Downloading-DNA-Data">Ancestry download instructions</a>.</p>
+    <h2 id="myheritage">MyHeritage</h2>
+    <p>Go to DNA, then Manage DNA kits. Use the three-dot menu next to a kit and choose Download. MyHeritage emails a link that is valid for 24 hours. Only the kit manager can download a MyHeritage test; uploaded files must be obtained from their original provider. <a href="https://www.myheritage.com/help/en/articles/12851869-how-do-i-download-my-raw-dna-data-file-from-myheritage">MyHeritage download instructions</a>.</p>
+    <h2 id="familytreedna">FamilyTreeDNA</h2>
+    <p>Sign in to your kit and use Results &amp; Tools, Autosomal DNA, Download Raw Data. Two-factor authentication is required. The Family Finder download is a CSV file compressed as GZ, and Twofold can read the GZ file directly. <a href="https://help.familytreedna.com/hc/en-us/articles/14860944283407-Downloading-Your-Family-Finder-Data">FamilyTreeDNA download instructions</a>.</p>
+    <h2 id="livingdna">Living DNA</h2>
+    <p>Sign in at my.livingdna.com, click your name in the top right corner and choose Profiles. Select the profile you want, then click Download next to its name. Tick the consent box, and the download options appear below. <a href="https://support.livingdna.com/hc/en-us/articles/360011384960-How-do-I-download-my-raw-data">Living DNA download instructions</a>.</p>
+    <p>Living DNA offers separate files for family ancestry, motherline and fatherline. Choose the family ancestry file. It holds the autosomal data Twofold reads, while the motherline and fatherline files only cover mitochondrial and Y chromosome markers.</p>
+    <h2 id="whole-genome">Whole genome sequencing</h2>
+    <p>If you had your whole genome sequenced, download the VCF file, which lists your variants. Skip the much larger BAM, CRAM and FASTQ files. Those hold raw sequencing reads that Twofold does not use. Twofold reads both .vcf and compressed .vcf.gz files. A whole genome VCF is large, so it takes longer to read than a file from a DNA test chip.</p>
+    <ul>
+      <li>Dante Labs: open Genome Manager and download the SNP VCF, the file ending in .snp.vcf.gz.</li>
+      <li>Sequencing.com: choose Files in the header, select your genome, then click the download arrow next to the .vcf file. <a href="https://biodecode.com/articles/download-your-raw-dna-data/">Steps for several providers</a>.</li>
+      <li>Nebula Genomics and DNA Complete: download the VCF from your account. Nebula has no public help page, so contact their support if you cannot find it.</li>
+    </ul>
+    <h2>Opening the file</h2>
+    <p>Choose the downloaded file on the start page. There is no need to unzip it first. Twofold reads it in your browser and never uploads it. Keep the file somewhere private, since it is sensitive personal information.</p>
+    <p><a class="button" href="/">Open your file</a></p>
+  </main>
+</Base>

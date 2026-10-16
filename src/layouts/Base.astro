@@ -1,0 +1,68 @@
+---
+import '@fontsource-variable/newsreader/wght.css'
+import '@fontsource-variable/newsreader/wght-italic.css'
+import '@fontsource/schibsted-grotesk/400.css'
+import '@fontsource/schibsted-grotesk/500.css'
+import '@fontsource/schibsted-grotesk/600.css'
+import '@fontsource/ibm-plex-mono/400.css'
+import '../styles/global.css'
+import '../styles/landing.css'
+import '../styles/report.css'
+import '../styles/print.css'
+const current = (href: string) => Astro.url.pathname === href ? 'page' : undefined
+const { title = 'Twofold', description = 'Read your raw DNA file against SNPedia, privately in your browser.' } = Astro.props
+const markPath = 'M0 33.026H184.32V217.346H0V33.026ZM92.16 70.286C97.65 70.286 102.915 72.467 106.798 76.349C110.679 80.231 112.86 85.496 112.86 90.986C112.86 96.476 110.679 101.741 106.798 105.623C102.915 109.505 97.65 111.686 92.16 111.686C86.67 111.686 81.405 109.505 77.523 105.623C73.641 101.741 71.46 96.476 71.46 90.986C71.46 85.496 73.641 80.231 77.523 76.349C81.405 72.467 86.67 70.286 92.16 70.286ZM92.16 124.646C97.65 124.646 102.915 126.827 106.798 130.709C110.679 134.591 112.86 139.856 112.86 145.346C112.86 161.906 105.12 173.786 86.76 180.986L82.44 175.586C87.84 173.066 88.74 169.754 90.36 165.974C85.031 165.528 80.081 163.039 76.548 159.026C73.014 155.012 71.17 149.788 71.403 144.445C71.636 139.103 73.927 134.058 77.796 130.368C81.665 126.676 86.813 124.626 92.16 124.646Z'
+const wordPath = 'M323.17 149.811Q323.17 158.413 328.482 162.573Q333.794 166.733 344.034 166.733Q348.719 166.733 354.364 165.798Q360.009 164.864 366.46 162.841V170.522Q358.038 176.256 351.51 179.648Q344.981 183.04 339.695 184.422Q334.409 185.805 329.596 185.805Q320.098 185.805 313.007 182.515Q305.916 179.226 301.948 172.467Q297.98 165.709 297.98 155.725V89.728L281.57 79.155V74.906Q285.18 72.806 288.789 70.502Q292.399 68.198 296.021 65.69Q299.644 63.181 303.138 60.608Q306.633 58.035 310.076 55.257Q313.519 52.48 316.77 49.715H323.17V73.702V149.811ZM313.109 84.864 313.237 70.016H362.748L360.956 84.864H313.109ZM524.77 81.51 508.719 76.774V70.016H551.906V76.774L538.313 81.459L506.466 185.344H491.925L454.703 93.133L461.385 91.904L424.188 185.344H409.621L376.776 82.918L360.597 76.723V70.016H419.273V76.774L402.914 82.074L427.593 161.664L421.423 161.562L458.031 67.968H471.241L508.463 161.357L502.473 161.331L524.77 81.51ZM608.943 173.414Q618.261 173.414 625.34 168.947Q632.418 164.48 636.322 154.97Q640.226 145.459 640.226 130.432Q640.226 113.766 636.424 102.605Q632.623 91.443 625.557 85.67Q618.492 79.898 608.431 79.898Q599.138 79.898 592.111 84.365Q585.084 88.832 581.103 98.342Q577.122 107.853 577.122 123.008Q577.122 139.443 580.911 150.72Q584.7 161.997 591.842 167.706Q598.985 173.414 608.943 173.414ZM607.97 186.112Q590.408 186.112 577.314 178.803Q564.22 171.494 557.09 158.285Q549.96 145.075 549.96 127.872Q549.96 110.08 557.564 96.371Q565.167 82.662 578.556 74.931Q591.945 67.2 609.404 67.2Q627.093 67.2 640.124 74.573Q653.154 81.946 660.348 95.027Q667.541 108.109 667.541 125.44Q667.541 143.206 659.938 156.928Q652.335 170.65 638.933 178.381Q625.532 186.112 607.97 186.112ZM701.18 84.864 695.138 88.295 672.661 83.149V77.901L697.109 68.992L706.223 70.016H757.602L755.606 84.864H701.18ZM720.482 170.778 741.654 177.075V183.296H676.604V177.075L695.138 170.931V66.97Q695.138 49.357 700.706 36.634Q706.274 23.91 715.938 15.859Q725.602 7.808 737.865 3.904Q750.127 0 763.516 0Q771.298 0 776.777 1.165Q782.255 2.33 785.673 4.39Q789.09 6.451 790.601 9.139Q792.111 11.827 792.111 14.925Q792.111 20.813 788.182 24.487Q784.252 28.16 778.517 28.16Q774.421 28.16 771.362 26.048Q768.303 23.936 765.308 21.12Q762.313 18.304 758.485 16.128Q754.658 13.952 749.103 13.952Q741.193 13.952 734.754 17.357Q728.316 20.762 724.399 28.582Q720.482 36.403 720.482 49.433V170.778ZM815.023 173.414Q824.341 173.414 831.42 168.947Q838.498 164.48 842.402 154.97Q846.306 145.459 846.306 130.432Q846.306 113.766 842.504 102.605Q838.703 91.443 831.637 85.67Q824.572 79.898 814.511 79.898Q805.218 79.898 798.191 84.365Q791.164 88.832 787.183 98.342Q783.202 107.853 783.202 123.008Q783.202 139.443 786.991 150.72Q790.78 161.997 797.922 167.706Q805.065 173.414 815.023 173.414ZM814.05 186.112Q796.488 186.112 783.394 178.803Q770.3 171.494 763.17 158.285Q756.04 145.075 756.04 127.872Q756.04 110.08 763.644 96.371Q771.247 82.662 784.636 74.931Q798.025 67.2 815.484 67.2Q833.173 67.2 846.204 74.573Q859.234 81.946 866.428 95.027Q873.621 108.109 873.621 125.44Q873.621 143.206 866.018 156.928Q858.415 170.65 845.013 178.381Q831.612 186.112 814.05 186.112ZM922.543 170.931 941.308 177.075V183.296H878.664V177.075L897.327 170.931V28.826Q895.586 26.855 892.578 24.807Q889.57 22.759 885.5 20.608Q881.429 18.458 876.437 16.435V11.571L920.546 0H924.361L922.543 23.68V170.931ZM1035.285 105.267Q1035.285 94.157 1028.488 87.117Q1021.692 80.077 1007.893 80.077Q997.116 80.077 989.538 85.389Q981.961 90.701 978.018 100.89Q974.076 111.078 974.076 125.619Q974.076 139.878 978.313 149.53Q982.55 159.181 990.281 163.994Q998.012 168.806 1008.508 168.806Q1017.365 168.806 1025.903 166.106Q1034.44 163.405 1042.632 157.696V166.81Q1033.007 172.826 1026.3 176.678Q1019.592 180.531 1014.626 182.554Q1009.66 184.576 1005.487 185.344Q1001.314 186.112 996.988 186.112Q980.552 186.112 969.25 179.328Q957.948 172.544 952.239 160.397Q946.53 148.25 946.53 132.224Q946.53 116.813 951.573 104.781Q956.616 92.749 965.5 84.365Q974.383 75.981 985.852 71.59Q997.321 67.2 1010.095 67.2Q1016.93 67.2 1023.241 68.288Q1029.551 69.376 1036.143 71.603Q1042.735 73.83 1050.261 77.67L1035.285 83.43V26.266Q1033.647 24.423 1030.716 22.592Q1027.784 20.762 1024.188 19.021Q1020.591 17.28 1016.648 15.591V10.957L1058.479 0H1062.191L1060.501 23.757V161.946Q1061.73 163.2 1063.817 164.557Q1065.903 165.914 1068.399 167.258Q1070.895 168.602 1073.378 169.587Q1075.861 170.573 1078.037 171.136V175.718L1042.402 185.805H1038.946L1035.285 164.48V105.267Z'
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/mark.svg" type="image/svg+xml" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/mark-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)" />
+    <title>{title}</title>
+    <script is:inline>try{var t=localStorage.getItem('twofold-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="shell">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="Twofold home">
+          <svg class="brand-logo" viewBox="0 0 1078.037 217.346" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d={markPath} /><path fill="currentColor" d={wordPath} /></svg>
+        </a>
+        <nav class="nav" aria-label="Main">
+          <a href="/get-data/" aria-current={current('/get-data/')}>Get your Data</a>
+          <a href="/privacy/" aria-current={current('/privacy/')}>Privacy</a>
+          <a href="/about/" class="nav-about" aria-current={current('/about/')}>About</a>
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+            <svg class="theme-dot" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="8" /></svg>
+          </button>
+        </nav>
+      </header>
+      <slot />
+      <footer class="site-footer">
+        <p class="credit">Made by <a href="https://brandonsaldan.com">Brandon Saldan</a>. Formerly GeneCodex.</p>
+        <p><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="https://github.com/brandonsaldan/codex">GitHub</a><span>SNPedia content CC BY-NC-SA 3.0 US</span></p>
+      </footer>
+    </div>
+    <script>
+      const toggle = document.getElementById('theme-toggle')
+      const media = window.matchMedia('(prefers-color-scheme: dark)')
+      const current = () => document.documentElement.dataset.theme || (media.matches ? 'dark' : 'light')
+      const label = () => toggle?.setAttribute('aria-label', current() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme')
+      label()
+      media.addEventListener('change', label)
+      toggle?.addEventListener('click', () => {
+        const next = current() === 'dark' ? 'light' : 'dark'
+        document.documentElement.dataset.theme = next
+        try { localStorage.setItem('twofold-theme', next) } catch {}
+        label()
+      })
+      if ('serviceWorker' in navigator && import.meta.env.PROD) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js') })
+    </script>
+  </body>
+</html>
