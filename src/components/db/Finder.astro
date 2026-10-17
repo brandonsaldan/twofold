@@ -51,8 +51,8 @@
       if (!/^(?:rs|i)\d+$/.test(id)) { lookup.textContent = ''; return }
       lookup.textContent = ''
       try {
-        const response = await fetch('/snp/' + id + '/', { method: 'HEAD' })
-        if (response.ok) { window.location.href = '/snp/' + id + '/'; return }
+        const response = await fetch('/snps/' + id + '/', { method: 'HEAD' })
+        if (response.ok) { window.location.href = '/snps/' + id + '/'; return }
       } catch {}
       const link = document.createElement('a')
       link.href = 'https://www.snpedia.com/index.php/' + id
