@@ -207,6 +207,7 @@ p {
 
 .nav a {
   color: var(--ink);
+  white-space: nowrap;
   text-decoration: none;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
@@ -613,6 +614,12 @@ html:has(.modal[open]) {
 
   .brand {
     font-size: 1.45rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .nav-privacy {
+    display: none;
   }
 }
 

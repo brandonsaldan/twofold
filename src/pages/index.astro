@@ -1,5 +1,29 @@
 ---
 import Base from '../layouts/Base.astro'
 import App from '../components/App'
+import { filePair, loadCatalog, namedGene } from '../lib/catalog'
+const catalog = loadCatalog()
+const byKind = (kind: string) => catalog.topics.filter(topic => topic.kind === kind).length
+const bySnp = new Map(catalog.snps.map(entry => [entry.snp.rsid, entry]))
+const capital = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
+const explore = {
+  stats: [[catalog.snps.length, 'SNP pages'], [byKind('gene'), 'genes'], [byKind('condition'), 'conditions'], [byKind('medicine'), 'medicines']] as Array<[number, string]>,
+  cards: ([['rs4988235', 'Digesting milk'], ['rs762551', 'Caffeine metabolism'], ['rs12913832', 'Eye color'], ['rs713598', 'Bitter taste']] as const)
+    .map(([rsid, theme]) => ({ theme, entry: bySnp.get(rsid) }))
+    .filter(item => item.entry)
+    .map(({ theme, entry }) => ({ theme, rsid: entry!.snp.rsid, gene: namedGene(entry!.snp.gene), pair: filePair(entry!.snp, entry!.top.alleles), summary: capital(entry!.top.summary.replace(/\.$/, '')) }))
+}
+const app = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Twofold',
+  url: new URL('/', Astro.site).href,
+  description: 'Free, open source raw DNA analysis that runs in your browser and explains 23andMe, AncestryDNA, MyHeritage and VCF files with SNPedia.',
+  applicationCategory: 'HealthApplication',
+  operatingSystem: 'Any modern web browser',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  author: { '@type': 'Person', name: 'Brandon Saldan', url: 'https://brandonsaldan.com' }
+}
 ---
-<Base title="Twofold | Read your raw DNA file privately"><App client:load /></Base>
+<Base title="Twofold: free, private raw DNA analysis with SNPedia" description="Free and open source. Twofold reads your 23andMe, AncestryDNA, MyHeritage or VCF raw data in your browser and explains it with SNPedia. Nothing is uploaded." jsonLd={[app]}><App client:load explore={explore} /></Base>

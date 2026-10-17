@@ -1,0 +1,21 @@
+---
+import ReputeTag from './Repute.astro'
+import type { Repute } from '../../lib/types'
+type Props = { shown: string; summary: string; repute: Repute; level: string; magnitude: number; frequency: string | null; href: string | null; label: string; top: boolean; anchor?: string; current?: boolean }
+const { shown, summary, repute, level, magnitude, frequency, href, label, top, anchor, current = false } = Astro.props
+const Tag = href ? 'a' : 'div'
+const classes = ['geno-card', top && 'is-top', current && 'is-current'].filter(Boolean).join(' ')
+---
+<li class={classes} id={anchor}>
+  <Tag class="geno-card-link" href={href || undefined} aria-label={href ? label : undefined} aria-current={current ? 'page' : undefined}>
+    <span class="geno-card-top">
+      <span class="geno-card-id">
+        <span class={shown.length > 5 ? 'geno-card-letters mono is-long' : 'geno-card-letters mono'}>{shown}</span>
+        {top && <span class="geno-card-flag">Most notable</span>}
+      </span>
+      <ReputeTag repute={repute} />
+    </span>
+    <span class="geno-card-summary">{summary || 'No summary available.'}</span>
+    <span class="geno-card-meta"><span>{level} · {magnitude.toFixed(1)}</span>{frequency && <span>{frequency} of people</span>}</span>
+  </Tag>
+</li>

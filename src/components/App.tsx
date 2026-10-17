@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import Landing from './Landing'
+import Landing, { type ExploreTeaser } from './Landing'
 import Dashboard from './report/Dashboard'
 import { forgetReport, hasSavedReport, unlockReport } from '../lib/storage'
 import { type ReportData, type ReportMeta, type SavedReport, type TopicKind } from '../lib/report'
@@ -20,7 +20,7 @@ const stepText = {
   matching: 'Matching against SNPedia'
 }
 
-export default function App({ startWithSample = false }: { startWithSample?: boolean }) {
+export default function App({ startWithSample = false, explore }: { startWithSample?: boolean; explore?: ExploreTeaser }) {
   const worker = useRef<Worker | null>(null)
   const ready = useRef(false)
   const queued = useRef<Job | null>(null)
@@ -101,7 +101,7 @@ export default function App({ startWithSample = false }: { startWithSample?: boo
   }
 
   if (stage.name === 'landing') {
-    return <Landing datasetError={datasetError} saved={saved} onFile={file => run({ type: 'process', file }, { sample: false, fileName: file.name })} onSample={() => run({ type: 'sample' }, { sample: true, fileName: 'Sample genome' })} onUnlock={unlock} onForgetSaved={forgetSaved} />
+    return <Landing explore={explore} datasetError={datasetError} saved={saved} onFile={file => run({ type: 'process', file }, { sample: false, fileName: file.name })} onSample={() => run({ type: 'sample' }, { sample: true, fileName: 'Sample genome' })} onUnlock={unlock} onForgetSaved={forgetSaved} />
   }
 
   if (stage.name === 'working') {

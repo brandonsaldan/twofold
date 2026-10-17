@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro'
+import CheckBand from '../../components/db/CheckBand.astro'
+import SnpediaCredit from '../../components/SnpediaCredit.astro'
+import SiteSearch from '../../components/db/SiteSearch.astro'
+import { filePair, kindPath, loadCatalog, snpHref, topicHref } from '../../lib/catalog'
+import { groupPlural } from '../../lib/report'
+
+const catalog = loadCatalog()
+const kinds = ['condition', 'medicine', 'gene'] as const
+const descriptions = { condition: 'Traits and conditions with genetic links.', medicine: 'Medicines affected by your genes.', gene: 'Genes with at least one linked SNP.' }
+const categories = kinds.map(kind => {
+  const topics = catalog.topics.filter(topic => topic.kind === kind)
+  return { kind, total: topics.length, top: [...topics].sort((a, b) => b.notable.length - a.notable.length || a.name.localeCompare(b.name)).slice(0, 5) }
+})
+const famous: Array<[string, string]> = [
+  ['rs4988235', 'Digesting milk'], ['rs762551', 'Caffeine metabolism'], ['rs1801133', 'Folate and MTHFR'], ['rs429358', "Alzheimer's risk"],
+  ['rs12913832', 'Eye color'], ['rs713598', 'Bitter taste'], ['rs671', 'Alcohol flush'], ['rs1815739', 'Sprint and power muscle'],
+  ['rs17822931', 'Earwax type'], ['rs1805007', 'Red hair'], ['rs9939609', 'Body weight'], ['rs1800562', 'Iron overload'],
+  ['rs6025', 'Blood clotting'], ['rs9923231', 'Warfarin dose'], ['rs4244285', 'Clopidogrel response'], ['rs7903146', 'Type 2 diabetes']
+]
+const bySnp = new Map(catalog.snps.map(entry => [entry.snp.rsid, entry]))
+const variants = famous.map(([rsid, theme]) => ({ theme, entry: bySnp.get(rsid)! })).filter(item => item.entry)
+const documented = catalog.snps.filter(entry => entry.indexed).length
+const dataset = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'Twofold SNP database',
+  description: `${catalog.snps.length.toLocaleString('en-US')} SNPs and ${catalog.topics.length.toLocaleString('en-US')} genes, conditions and medicines from SNPedia, with genotype meanings, magnitudes and HapMap population frequencies.`,
+  url: new URL('/explore/', Astro.site).href,
+  keywords: ['SNP', 'genotype', 'SNPedia', 'raw DNA data', 'pharmacogenetics', '23andMe', 'AncestryDNA'],
+  license: 'https://creativecommons.org/licenses/by-nc-sa/3.0/us/',
+  isAccessibleForFree: true,
+  isBasedOn: 'https://www.snpedia.com/',
+  creator: { '@type': 'Organization', name: 'SNPedia', url: 'https://www.snpedia.com/' },
+  publisher: { '@type': 'Organization', name: 'Twofold', url: new URL('/', Astro.site).href },
+  dateModified: catalog.snapshotAt.slice(0, 10)
+}
+---
+<Base jsonLd={[dataset]} title="SNP database: genes, conditions and medicines | Twofold" description={`Search ${catalog.snps.length.toLocaleString('en-US')} SNPs and ${catalog.topics.length.toLocaleString('en-US')} genes, conditions and medicines, with what every genotype means. Then check your own raw DNA file privately.`}>
+  <main class="db" id="main">
+    <header class="db-head explore-head">
+      <h1>Explore</h1>
+      <p class="db-lede">Search {catalog.snps.length.toLocaleString('en-US')} SNPs and {catalog.topics.length.toLocaleString('en-US')} genes, conditions and medicines, or browse by category.</p>
+      <SiteSearch large />
+    </header>
+
+    <CheckBand title="Check your own raw data" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding in your file. Your file is processed in your browser and never uploaded." />
+
+    <section class="db-section" aria-labelledby="browse-title">
+      <div class="db-section-head"><h2 id="browse-title">Browse</h2></div>
+      <ul class="category-grid">
+        {categories.map(category => (
+          <li class="category">
+            <a class="category-head" href={kindPath(category.kind)}><span class="category-name">{groupPlural[category.kind]}</span><span class="category-count">{category.total.toLocaleString('en-US')}</span></a>
+            <p class="category-text">{descriptions[category.kind]}</p>
+            <ul class="category-links">
+              {category.top.map(topic => <li><a href={topicHref(category.kind, topic.slug)}>{topic.name}</a></li>)}
+            </ul>
+            <a class="category-all" href={kindPath(category.kind)}>All {groupPlural[category.kind].toLowerCase()}</a>
+          </li>
+        ))}
+        <li class="category">
+          <a class="category-head" href="/snps/"><span class="category-name">SNPs</span><span class="category-count">{catalog.snps.length.toLocaleString('en-US')}</span></a>
+          <p class="category-text">SNPs with a notable genotype or detailed notes.</p>
+          <ul class="category-links">
+            {variants.slice(0, 5).map(item => <li><a class="mono" href={snpHref(item.entry.snp.rsid)}>{item.entry.snp.rsid}</a></li>)}
+          </ul>
+          <a class="category-all" href="/snps/">{documented.toLocaleString('en-US')} well documented</a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="db-section" aria-labelledby="famous-title">
+      <div class="db-section-head"><h2 id="famous-title">Well-known SNPs</h2></div>
+      <ul class="famous-grid">
+        {variants.map(({ theme, entry }) => (
+          <li>
+            <a class="famous" href={snpHref(entry.snp.rsid)}>
+              <span class="famous-theme">{theme}</span>
+              <span class="famous-id"><span class="mono">{entry.snp.rsid}</span>{entry.snp.gene && !entry.snp.gene.startsWith('LOC') && <span>{entry.snp.gene}</span>}</span>
+              <span class="famous-summary"><span class="mono">{filePair(entry.snp, entry.top.alleles)}</span> {entry.top.summary}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <SnpediaCredit href="https://www.snpedia.com/" snapshotAt={catalog.snapshotAt} />
+  </main>
+</Base>

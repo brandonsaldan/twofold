@@ -1,0 +1,10 @@
+---
+import { formatDate } from '../lib/report'
+type Props = { href: string; label?: string; snapshotAt: string }
+const { href, label, snapshotAt } = Astro.props
+---
+<section class="entry-credit" aria-labelledby="credit-title">
+  <h2 id="credit-title">Source and license</h2>
+  <p>Adapted from <a href={href}>{label ? `${label} on SNPedia` : 'SNPedia'}</a>, using a snapshot taken {formatDate(snapshotAt)}. SNPedia content is shared under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/us/">CC BY-NC-SA 3.0 US</a>, and this page is shared under the same license.</p>
+  <p>SNPedia is a community-edited wiki. Its entries can be incomplete, out of date or wrong, and nothing here is a diagnosis or medical advice. Magnitude is a community rating of how interesting a genotype is, not a risk score.</p>
+</section>

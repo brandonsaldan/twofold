@@ -1,0 +1,12 @@
+---
+import TopicPage from '../../components/db/TopicPage.astro'
+import { loadCatalog, type TopicEntry } from '../../lib/catalog'
+
+export function getStaticPaths() {
+  const catalog = loadCatalog()
+  return catalog.topics.filter(topic => topic.kind === 'medicine').map(topic => ({ params: { slug: topic.slug }, props: { topic, snapshotAt: catalog.snapshotAt, minimum: catalog.minimum } }))
+}
+
+type Props = { topic: TopicEntry; snapshotAt: string; minimum: number }
+---
+<TopicPage {...Astro.props} />

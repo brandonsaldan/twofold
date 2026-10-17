@@ -3,7 +3,13 @@ import { Icon, Magnitude, Pair, ReputeTag } from './ui'
 import { Bar } from './report/charts'
 import type { Repute } from '../lib/types'
 
+export type ExploreTeaser = {
+  stats: Array<[number, string]>
+  cards: Array<{ theme: string; rsid: string; gene: string; pair: string; summary: string }>
+}
+
 type Props = {
+  explore?: ExploreTeaser
   datasetError: string
   saved: boolean
   onFile: (file: File) => void
@@ -34,7 +40,15 @@ const sampleTopics = [
   { name: 'CYP2D6', kind: 'Gene', total: 20 }
 ]
 
-export default function Landing({ datasetError, saved, onFile, onSample, onUnlock, onForgetSaved }: Props) {
+const questions: Array<[string, string]> = [
+  ['Is Twofold free?', 'Yes. There is no fee, account or subscription, and the source code is public on GitHub.'],
+  ['Is my DNA file uploaded?', 'No. Your file is read in your browser and never sent anywhere. Twofold has no upload endpoint, and it works offline after your first visit.'],
+  ['Which files can I use?', 'Raw data from 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA and Living DNA, plus VCF files from whole genome sequencing. ZIP and GZ files work without unzipping.'],
+  ['Where do the explanations come from?', 'From SNPedia, a community wiki of SNPs and genotypes, the same source Promethease uses. Twofold reads a dated snapshot of it.'],
+  ['Is this medical advice?', 'No. SNPedia entries can be incomplete or wrong, and consumer chips sometimes misread rare variants. Confirm important findings with a clinical test.']
+]
+
+export default function Landing({ explore, datasetError, saved, onFile, onSample, onUnlock, onForgetSaved }: Props) {
   const input = useRef<HTMLInputElement | null>(null)
   const [dragging, setDragging] = useState(false)
   const [passphrase, setPassphrase] = useState('')
@@ -226,6 +240,49 @@ export default function Landing({ datasetError, saved, onFile, onSample, onUnloc
             </li>
           ))}
         </ul>
+      </section>
+
+      {explore && (
+        <section className="explore-teaser" aria-labelledby="explore-title">
+          <div className="explore-teaser-intro">
+            <h2 id="explore-title">Look up any gene or SNP.</h2>
+            <p>Every notable SNP has its own page, with what each genotype means, how common it is and which tests include it.</p>
+            <ul className="explore-stats">
+              {explore.stats.map(([value, label]) => <li key={label}><span className="explore-stat-value">{value.toLocaleString('en-US')}</span><span className="explore-stat-label">{label}</span></li>)}
+            </ul>
+            <div className="explore-teaser-actions">
+              <a className="button" href="/explore/">Explore the database</a>
+              <p className="explore-teaser-links">Or browse <a href="/conditions/">conditions</a>, <a href="/medicines/">medicines</a> or <a href="/genes/">genes</a></p>
+            </div>
+          </div>
+          <ul className="explore-cards">
+            {explore.cards.map(card => (
+              <li key={card.rsid}>
+                <a className="explore-card" href={`/snps/${card.rsid}/`}>
+                  <span className="explore-card-theme">{card.theme}</span>
+                  <span className="explore-card-id"><span className="mono">{card.rsid}</span>{card.gene && <span>{card.gene}</span>}</span>
+                  <span className="explore-card-summary"><span className="explore-card-pair mono">{card.pair}</span>{card.summary}</span>
+                  <span className="explore-card-more">View SNP<Icon name="arrow" /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="faq-section" aria-labelledby="faq-title">
+        <header className="section-head">
+          <h2 id="faq-title">Questions</h2>
+        </header>
+        <div className="landing-faq">
+          {questions.map(([question, answer]) => (
+            <details key={question}>
+              <summary>{question}</summary>
+              <p>{answer}</p>
+            </details>
+          ))}
+        </div>
+        <p className="landing-faq-more">Coming from Promethease? <a href="/promethease-alternative/">See how Twofold compares</a>.</p>
       </section>
 
       <section className="closing" aria-labelledby="closing-title">

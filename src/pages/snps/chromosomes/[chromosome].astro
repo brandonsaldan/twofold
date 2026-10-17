@@ -1,0 +1,59 @@
+---
+import Base from '../../../layouts/Base.astro'
+import SnpediaCredit from '../../../components/SnpediaCredit.astro'
+import Crumbs from '../../../components/db/Crumbs.astro'
+import CheckBand from '../../../components/db/CheckBand.astro'
+import Finder from '../../../components/db/Finder.astro'
+import SearchIcon from '../../../components/db/SearchIcon.astro'
+import { chromosomeLabel, chromosomeOf, filePair, importance, loadCatalog, snpHref, type SnpEntry } from '../../../lib/catalog'
+import { chromosomeOrder } from '../../../lib/report'
+
+export function getStaticPaths() {
+  const catalog = loadCatalog()
+  const documented = catalog.snps.filter(entry => entry.indexed)
+  return [...chromosomeOrder, ''].map(chromosome => ({
+    chromosome,
+    entries: documented.filter(entry => chromosomeOrder.includes(chromosomeOf(entry.snp)) ? chromosomeOf(entry.snp) === chromosome : chromosome === '').sort((a, b) => (a.snp.position ?? 0) - (b.snp.position ?? 0))
+  })).filter(group => group.entries.length).map(group => ({ params: { chromosome: group.chromosome ? group.chromosome.toLowerCase() : 'unplaced' }, props: { ...group, snapshotAt: catalog.snapshotAt } }))
+}
+
+type Props = { chromosome: string; entries: SnpEntry[]; snapshotAt: string }
+const { chromosome, entries, snapshotAt } = Astro.props
+const label = chromosomeLabel(chromosome)
+---
+<Base title={`${label} SNPs | Twofold`} description={`${entries.length.toLocaleString('en-US')} well-documented SNPs on ${label.toLowerCase()}, in order of position, with what every genotype means. Check them in your own raw DNA file privately.`}>
+  <main class="db" id="main">
+    <div class="db-bar"><Crumbs items={[{ name: 'Explore', href: '/explore/' }, { name: 'SNPs', href: '/snps/' }, { name: label }]} /></div>
+    <header class="db-head">
+      <h1>{label}</h1>
+      <p class="db-lede">{entries.length.toLocaleString('en-US')} well-documented SNPs on {chromosome ? label.toLowerCase() : 'no listed chromosome'}, in order of position (GRCh38).</p>
+    </header>
+
+    <CheckBand title="Check your own raw data" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding in your file. Your file is processed in your browser and never uploaded." />
+
+    <div id="index">
+      <div class="filter filter-sticky" data-finder="index" hidden>
+        <label class="filter-box">
+          <SearchIcon />
+          <span class="visually-hidden">Filter SNPs</span>
+          <input type="search" data-query placeholder="Filter by rsID, gene or keyword" autocomplete="off" />
+        </label>
+        <p class="filter-status" data-status role="status"></p>
+      </div>
+      <ul class="db-row-list" data-list id="chromosome-list">
+        {entries.map(({ snp, top }) => (
+          <li data-item>
+            <a class="db-row" href={snpHref(snp.rsid)}>
+              <span class="db-row-id mono">{snp.rsid}<span class="db-row-gene">{[snp.gene, snp.position ? snp.position.toLocaleString('en-US') : ''].filter(Boolean).join(' · ')}</span></span>
+              <span class="db-row-text"><span class="mono db-row-pair">{filePair(snp, top.alleles)}</span>{top.summary || 'No summary available.'}</span>
+              <span class="db-row-side">{importance(top.magnitude)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="filter-empty" data-empty hidden>No matches.</p>
+    </div>
+    <SnpediaCredit href="https://www.snpedia.com/" snapshotAt={snapshotAt} />
+  </main>
+  <Finder />
+</Base>

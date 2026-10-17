@@ -1,0 +1,14 @@
+---
+type Props = { title: string; text: string }
+const { title, text } = Astro.props
+---
+<aside class="check-band" aria-label="Check your own file">
+  <div>
+    <h2 class="check-title">{title}</h2>
+    <p>{text}</p>
+  </div>
+  <div class="check-actions">
+    <a class="button" href="/">Check your own file</a>
+    <a class="check-link" href="/get-data/">How to get your raw data</a>
+  </div>
+</aside>

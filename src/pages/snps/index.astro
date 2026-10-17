@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro'
+import SnpediaCredit from '../../components/SnpediaCredit.astro'
+import Crumbs from '../../components/db/Crumbs.astro'
+import CheckBand from '../../components/db/CheckBand.astro'
+import { chromosomeHref, chromosomeLabel, chromosomeOf, loadCatalog } from '../../lib/catalog'
+import { chromosomeOrder } from '../../lib/report'
+
+const catalog = loadCatalog()
+const documented = catalog.snps.filter(entry => entry.indexed)
+const groups = [...chromosomeOrder, ''].map(chromosome => ({ chromosome, total: documented.filter(entry => chromosomeOrder.includes(chromosomeOf(entry.snp)) ? chromosomeOf(entry.snp) === chromosome : chromosome === '').length })).filter(group => group.total)
+---
+<Base title="SNPs by chromosome | Twofold" description={`Browse ${documented.length.toLocaleString('en-US')} well-documented SNPs by chromosome, with what every genotype means. Check them in your own raw DNA file privately.`}>
+  <main class="db" id="main">
+    <div class="db-bar"><Crumbs items={[{ name: 'Explore', href: '/explore/' }, { name: 'SNPs' }]} /></div>
+    <header class="db-head">
+      <h1>SNPs</h1>
+      <p class="db-lede">{documented.length.toLocaleString('en-US')} well-documented SNPs, grouped by chromosome. Search from <a href="/explore/">Explore</a> to reach any of the {catalog.snps.length.toLocaleString('en-US')} SNP pages.</p>
+    </header>
+
+    <CheckBand title="Check your own raw data" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding in your file. Your file is processed in your browser and never uploaded." />
+
+    <section class="db-section" aria-labelledby="chromosomes-title">
+      <div class="db-section-head"><h2 id="chromosomes-title">Chromosomes</h2></div>
+      <ul class="chromosome-grid">
+        {groups.map(group => <li><a href={chromosomeHref(group.chromosome)} aria-label={`${chromosomeLabel(group.chromosome)}, ${group.total.toLocaleString('en-US')} SNPs`}><span class="chromosome-name">{group.chromosome || '?'}</span><span class="chromosome-count">{group.total.toLocaleString('en-US')} SNPs</span></a></li>)}
+      </ul>
+    </section>
+
+    <SnpediaCredit href="https://www.snpedia.com/" snapshotAt={catalog.snapshotAt} />
+  </main>
+</Base>

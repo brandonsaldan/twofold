@@ -1,0 +1,187 @@
+---
+import Base from '../../layouts/Base.astro'
+import SnpediaCredit from '../../components/SnpediaCredit.astro'
+import DbBar from '../../components/db/DbBar.astro'
+import CheckBand from '../../components/db/CheckBand.astro'
+import GenoCard from '../../components/db/GenoCard.astro'
+import { describe, namedGene, fileLetters, filePair, genotypeHref, genotypeSlug, importance, kindPath, loadCatalog, snpHref, topicHref, type SnpEntry } from '../../lib/catalog'
+import { genotypeUrl, groupLabel, noteSegments, pair, populations, referenceLink, snpediaUrl } from '../../lib/report'
+
+export function getStaticPaths() {
+  const catalog = loadCatalog()
+  return catalog.snps.map(entry => ({ params: { rsid: entry.snp.rsid }, props: { entry, snapshotAt: catalog.snapshotAt } }))
+}
+
+type Props = { entry: SnpEntry; snapshotAt: string }
+const { entry, snapshotAt } = Astro.props
+const { snp, notes, top, gene, topics, flipped, indexed, providers, related, genosets, shares } = entry
+const id = snp.rsid
+const chromosome = snp.chromosome.replace(/^chr/i, '').toUpperCase()
+const letters = snp.genotypes.map(genotype => fileLetters(snp, genotype.alleles))
+const listed = letters.length > 1 ? `${letters.slice(0, -1).join(', ')} and ${letters[letters.length - 1]}` : letters[0]
+const label = namedGene(snp.gene) ? ` (${namedGene(snp.gene)})` : ''
+const title = letters.length <= 3 && letters.every(value => /^[ACGT]{1,2}$/.test(value)) ? `${id}${label}: what ${listed} mean | Twofold` : `${id}${label} genotypes and what they mean | Twofold`
+const description = describe(`${id}${pair(top.alleles)}${flipped ? `, shown as ${fileLetters(snp, top.alleles)} in 23andMe and AncestryDNA files` : ''}: ${top.summary || `magnitude ${top.magnitude}`}.`, `See what every ${id} genotype means and check your own raw DNA file privately.`)
+const round = (value: number) => value > 0 && value < 1 ? '<1%' : `${Math.round(value)}%`
+const versions = snp.genotypes.map((genotype, index) => {
+  const values = shares.map(share => share.values[index])
+  const own = Object.entries(notes.genotypes).find(([key]) => key.toLowerCase() === genotype.title.toLowerCase())?.[1]
+  return {
+    genotype,
+    shown: filePair(snp, genotype.alleles),
+    anchor: genotypeSlug(snp, genotype.alleles),
+    href: genotypeHref(entry, genotype.alleles),
+    top: genotype === top,
+    average: values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null,
+    notes: own
+  }
+})
+const topShown = filePair(snp, top.alleles)
+const references = [...new Set(versions.flatMap(item => item.notes?.references || []))].map(referenceLink)
+const noteLength = notes.body.length + versions.reduce((total, item) => total + (item.notes?.body.length || 0), 0)
+const linked = topics.filter(topic => topic.kind !== 'gene' || topic.name.toLowerCase() !== snp.gene.toLowerCase())
+const crumbs = [{ name: 'Explore', href: '/explore/' }, ...(gene?.slug ? [{ name: 'Genes', href: kindPath('gene') }, { name: gene.name, href: topicHref('gene', gene.slug) }] : [{ name: 'SNPs', href: '/snps/' }]), { name: id }]
+const consumer = ['23andMe', 'AncestryDNA', 'FamilyTreeDNA'].map(name => ({ name, versions: providers.find(provider => provider.name === name)?.versions })).filter(item => item.versions)
+const rows = [
+  ...(shares.length > 1 ? [{ name: 'Average', values: versions.map(item => item.average ?? 0), average: true }] : []),
+  ...shares.map(share => ({ name: populations[share.population] || share.population, values: share.values, average: false }))
+].map(row => {
+  const total = row.values.reduce((sum, value) => sum + value, 0) || 1
+  let x = 0
+  return { ...row, parts: row.values.map((value, index) => { const width = (value / total) * 100; const part = { x, width, index }; x += width; return part }) }
+})
+---
+<Base title={title} description={description} type="article" noindex={!indexed}>
+  <main class="db" id="main">
+    <DbBar items={crumbs} />
+
+    <header class="db-head">
+      <h1 class="mono">{id}</h1>
+      <p class="db-lede">A SNP{snp.gene ? <> in the {gene?.slug ? <a href={topicHref('gene', gene.slug)}>{snp.gene}</a> : snp.gene} gene</> : ''}{chromosome && ` on chromosome ${chromosome}`}. Its most notable genotype is <a class="mono" href={versions.find(item => item.top)!.href}>{topShown}</a>{top.summary ? `: ${top.summary}` : '.'}</p>
+    </header>
+
+    <dl class="db-facts">
+      <div><dt>Gene</dt><dd>{gene?.slug ? <a href={topicHref('gene', gene.slug)}>{snp.gene}</a> : snp.gene || 'None listed'}</dd></div>
+      {chromosome && <div><dt>Location</dt><dd>Chr {chromosome}{snp.position ? <span class="db-facts-sub">{snp.position.toLocaleString('en-US')} (GRCh38)</span> : ''}</dd></div>}
+      <div><dt>Highest magnitude</dt><dd>{top.magnitude.toFixed(1)}<span class="db-facts-sub">{importance(top.magnitude)}</span></dd></div>
+      <div><dt>Tested on</dt><dd>{consumer.length ? consumer.map(item => item.name).join(', ') : 'Not on consumer chips'}</dd></div>
+      {snp.gmaf !== null && <div><dt>Minor allele frequency</dt><dd>{round(snp.gmaf * 100)}</dd></div>}
+    </dl>
+
+    <CheckBand title={`Which ${id} genotype do you have?`} text={`Load your raw data from 23andMe, AncestryDNA or another test to see your ${id} genotype and every other notable finding. Your file is processed in your browser and never uploaded.`} />
+
+    <section class="db-section" aria-labelledby="genotypes-title">
+      <div class="db-section-head">
+        <h2 id="genotypes-title">Genotypes</h2>
+        <p>{flipped ? 'Plus strand, as in 23andMe and AncestryDNA files.' : 'As shown in 23andMe and AncestryDNA files.'}</p>
+      </div>
+      <ol class="geno-grid">
+        {versions.map(item => <GenoCard shown={item.shown} summary={item.genotype.summary} repute={item.genotype.repute} level={importance(item.genotype.magnitude)} magnitude={item.genotype.magnitude} frequency={item.average !== null ? round(item.average) : null} href={indexed ? item.href : null} label={`${id}(${item.shown}): ${item.genotype.summary || 'details'}`} top={item.top} anchor={item.anchor} />)}
+      </ol>
+      <p class="db-footnote">
+        {flipped ? <>SNPedia records {id} on the minus strand: </> : <>On SNPedia: </>}
+        {versions.map((item, index) => <>{index > 0 && ', '}<a class="mono" href={genotypeUrl(id, item.genotype.alleles)}>{pair(item.genotype.alleles)}</a></>)}.
+        Magnitude rates how notable a genotype is from 0 to 10, not how risky it is.
+      </p>
+    </section>
+
+    {rows.length > 0 && (
+      <section class="db-section" aria-labelledby="frequency-title">
+        <div class="db-section-head">
+          <h2 id="frequency-title">Frequency</h2>
+          <p>Share of each genotype in {shares.length === 1 ? 'one HapMap population' : `${shares.length} HapMap populations`}.</p>
+        </div>
+        <ul class="freq-legend" aria-hidden="true">
+          {versions.map((item, index) => <li><span class={`freq-swatch seg-${index % 4}`} /><span class="mono">{item.shown}</span></li>)}
+        </ul>
+        <ul class="freq-rows">
+          {rows.map(row => (
+            <li class={row.average ? 'is-average' : undefined}>
+              <span class="freq-name">{row.name}</span>
+              <svg class="freq-bar" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                {row.parts.map(part => <rect x={part.x} y="0" width={part.width} height="10" class={`seg-${part.index % 4}`} />)}
+              </svg>
+              <span class="freq-values mono">{row.values.map((value, index) => `${versions[index].shown} ${round(value).padStart(4)}`).join('  ')}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {(related.length > 0 || linked.length > 0 || genosets.length > 0) && (
+      <section class="db-section" aria-labelledby="related-title">
+        <div class="db-section-head"><h2 id="related-title">Related</h2></div>
+        {linked.length > 0 && (
+          <div class="db-group">
+            <h3>Conditions, medicines and genes</h3>
+            <ul class="chip-list">
+              {linked.map(topic => <li>{topic.slug ? <a class="chip" href={topicHref(topic.kind, topic.slug)}>{topic.name}<span>{groupLabel[topic.kind]}</span></a> : <span class="chip is-plain">{topic.name}<span>{groupLabel[topic.kind]}</span></span>}</li>)}
+            </ul>
+          </div>
+        )}
+        {related.length > 0 && (
+          <div class="db-group">
+            <h3>Other {snp.gene} SNPs</h3>
+            <ul class="db-row-list">
+              {related.map(other => (
+                <li>
+                  <a class="db-row" href={snpHref(other.rsid)}>
+                    <span class="db-row-id mono">{other.rsid}</span>
+                    <span class="db-row-text"><span class="mono db-row-pair">{other.pair}</span>{other.summary || 'No summary available.'}</span>
+                    <span class="db-row-side">{importance(other.magnitude)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {gene?.slug && <p class="db-more"><a href={topicHref('gene', gene.slug)}>All {snp.gene} SNPs</a></p>}
+          </div>
+        )}
+        {genosets.length > 0 && (
+          <div class="db-group">
+            <h3>Genosets</h3>
+            <ul class="db-row-list">
+              {genosets.map(set => (
+                <li>
+                  <a class="db-row" href={snpediaUrl(set.title)}>
+                    <span class="db-row-id mono">{set.title}</span>
+                    <span class="db-row-text">{set.summary || 'No summary available.'}</span>
+                    <span class="db-row-side">{importance(set.magnitude)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p class="db-footnote">Genosets combine several genotypes. Twofold checks them in your report.</p>
+          </div>
+        )}
+      </section>
+    )}
+
+    {(noteLength > 0 || references.length > 0) && (
+      <section class="db-section" aria-labelledby="notes-title">
+        <div class="db-section-head"><h2 id="notes-title">Notes</h2><p>From SNPedia</p></div>
+        {noteLength > 0 && (
+          <details class="db-notes" open={noteLength < 700}>
+            <summary>{noteLength < 700 ? 'Notes' : `Show notes, about ${Math.max(10, Math.round(noteLength / 60) * 10).toLocaleString('en-US')} words`}</summary>
+            <div class="db-notes-body">
+              {notes.body && <p>{noteSegments(notes.body).map(part => part.href ? <a href={part.href}>{part.text}</a> : part.text)}</p>}
+              {versions.filter(item => item.notes?.body).map(item => (
+                <>
+                  <h3 class="mono">{item.shown}</h3>
+                  <p>{noteSegments(item.notes!.body).map(part => part.href ? <a href={part.href}>{part.text}</a> : part.text)}</p>
+                </>
+              ))}
+            </div>
+          </details>
+        )}
+        {references.length > 0 && (
+          <div class="db-group">
+            <h3>References</h3>
+            <ul class="ref-list">{references.map(link => <li>{link.href ? <a href={link.href}>{link.text}</a> : link.text}</li>)}</ul>
+          </div>
+        )}
+      </section>
+    )}
+
+    <SnpediaCredit href={snpediaUrl(id)} label={id} snapshotAt={snapshotAt} />
+  </main>
+</Base>

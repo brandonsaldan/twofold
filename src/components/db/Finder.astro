@@ -1,0 +1,63 @@
+<script>
+  for (const root of Array.from(document.querySelectorAll<HTMLElement>('[data-finder]'))) {
+    const scope = document.getElementById(root.dataset.finder || '') || document.body
+    const input = root.querySelector<HTMLInputElement>('[data-query]')
+    const status = root.querySelector<HTMLElement>('[data-status]')
+    const empty = scope.querySelector<HTMLElement>('[data-empty]')
+    const lists = Array.from(scope.querySelectorAll<HTMLElement>('[data-list]')).map(list => {
+      const items = Array.from(list.querySelectorAll<HTMLElement>('[data-item]'))
+      return {
+        items,
+        texts: items.map(item => (item.textContent || '').toLowerCase().replace(/\s+/g, ' ')),
+        limit: Number(list.dataset.limit || 0),
+        more: scope.querySelector<HTMLButtonElement>('[data-more="' + list.id + '"]'),
+        section: list.closest<HTMLElement>('[data-section]'),
+        open: false
+      }
+    })
+    const apply = () => {
+      const words = (input?.value || '').trim().toLowerCase().split(/\s+/).filter(Boolean)
+      const searching = words.length > 0
+      let total = 0
+      for (const list of lists) {
+        let matched = 0
+        list.items.forEach((item, index) => {
+          const match = words.every(word => list.texts[index].includes(word))
+          if (match) matched += 1
+          item.hidden = searching ? !match : !list.open && list.limit > 0 && index >= list.limit
+        })
+        total += matched
+        if (list.more) {
+          list.more.hidden = searching || list.open || list.limit === 0 || list.items.length <= list.limit
+          list.more.textContent = 'Show all ' + list.items.length.toLocaleString('en-US')
+        }
+        if (list.section) list.section.hidden = searching && matched === 0
+      }
+      if (status) status.textContent = searching ? (total === 1 ? '1 match' : total.toLocaleString('en-US') + ' matches') : ''
+      if (empty) empty.hidden = !searching || total > 0
+    }
+    for (const list of lists) list.more?.addEventListener('click', () => { list.open = true; apply() })
+    input?.addEventListener('input', apply)
+    root.hidden = false
+    apply()
+
+    const form = root.closest<HTMLFormElement>('form[data-lookup]') || root.querySelector<HTMLFormElement>('form[data-lookup]')
+    const lookup = form?.querySelector<HTMLElement>('[data-lookup-status]')
+    form?.addEventListener('submit', async event => {
+      event.preventDefault()
+      if (!input || !lookup) return
+      const value = input.value.trim().toLowerCase().replace(/\s+/g, '')
+      const id = /^\d+$/.test(value) ? 'rs' + value : value
+      if (!/^(?:rs|i)\d+$/.test(id)) { lookup.textContent = ''; return }
+      lookup.textContent = ''
+      try {
+        const response = await fetch('/snp/' + id + '/', { method: 'HEAD' })
+        if (response.ok) { window.location.href = '/snp/' + id + '/'; return }
+      } catch {}
+      const link = document.createElement('a')
+      link.href = 'https://www.snpedia.com/index.php/' + id
+      link.textContent = 'Open ' + id + ' on SNPedia'
+      lookup.replaceChildren('No page for ' + id + '. Pages cover SNPs with a notable genotype or detailed notes. ', link)
+    })
+  }
+</script>

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { Finding, Repute } from '../../lib/types'
 import { chromosomeOf, chromosomeOrder, groupOf, groupPlural, reputeLabel, reputes, topicName, topicsOf, type TopicGroup } from '../../lib/report'
-import { Hint, Icon } from '../ui'
+import { Dropdown, Hint, Icon } from '../ui'
 import FindingTable from './FindingTable'
 import type { ReportContext } from './Dashboard'
 
@@ -88,40 +88,29 @@ export default function FindingsView({ context, filters, setFilters }: Props) {
           {reputes.map(repute => <button key={repute} type="button" aria-pressed={filters.repute === repute} onClick={() => update({ repute })}>{reputeLabel[repute]}</button>)}
         </div>
         <div className="toolbar-row">
-          <label className="select">
-            <span>Magnitude</span>
-            <span className="select-control"><select value={filters.maximum === null ? filters.minimum : ''} onChange={event => update({ minimum: Number(event.target.value), maximum: null })}>
-              {filters.maximum !== null && <option value="">{filters.minimum < 1 ? 'Under 1' : `${filters.minimum} to ${filters.maximum - 0.1}`}</option>}
-              <option value={0}>Any</option>
-              {[1, 2, 3, 4, 5, 6].map(value => <option key={value} value={value}>{value} and up</option>)}
-            </select></span>
-          </label>
-          <label className="select">
-            <span>Chromosome</span>
-            <span className="select-control"><select value={filters.chromosome} onChange={event => update({ chromosome: event.target.value })}>
-              <option value="">All</option>
-              {chromosomes.map(value => <option key={value} value={value}>{value}</option>)}
-            </select></span>
-          </label>
-          <label className="select select-wide">
-            <span>Topic</span>
-            <span className="select-control"><select value={filters.topic} onChange={event => update({ topic: event.target.value })}>
-              <option value="">All topics</option>
-              {topicOptions.map(entry => (
-                <optgroup key={entry.group} label={groupPlural[entry.group]}>
-                  {entry.topics.map(([topic, total]) => <option key={topic} value={topic}>{topicName(topic, meta.topicKinds)} ({total})</option>)}
-                </optgroup>
-              ))}
-            </select></span>
-          </label>
-          <label className="select">
-            <span>Sort</span>
-            <span className="select-control"><select value={filters.sort} onChange={event => update({ sort: event.target.value as Filters['sort'] })}>
-              <option value="magnitude">Magnitude</option>
-              <option value="position">Position</option>
-              <option value="rsid">rsID</option>
-            </select></span>
-          </label>
+          <div className="select">
+            <span aria-hidden="true">Magnitude</span>
+            <Dropdown label="Magnitude" value={filters.maximum === null ? String(filters.minimum) : ''} onChange={value => update({ minimum: Number(value), maximum: null })} options={[
+              ...(filters.maximum !== null ? [{ value: '', label: filters.minimum < 1 ? 'Under 1' : `${filters.minimum} to ${filters.maximum - 0.1}` }] : []),
+              { value: '0', label: 'Any' },
+              ...[1, 2, 3, 4, 5, 6].map(value => ({ value: String(value), label: `${value} and up` }))
+            ]} />
+          </div>
+          <div className="select">
+            <span aria-hidden="true">Chromosome</span>
+            <Dropdown label="Chromosome" value={filters.chromosome} onChange={value => update({ chromosome: value })} options={[{ value: '', label: 'All' }, ...chromosomes.map(value => ({ value, label: value }))]} />
+          </div>
+          <div className="select select-wide">
+            <span aria-hidden="true">Topic</span>
+            <Dropdown label="Topic" value={filters.topic} onChange={value => update({ topic: value })} options={[
+              { value: '', label: 'All topics' },
+              ...topicOptions.flatMap(entry => entry.topics.map(([topic, total]) => ({ value: topic, label: `${topicName(topic, meta.topicKinds)} (${total})`, group: groupPlural[entry.group] })))
+            ]} />
+          </div>
+          <div className="select">
+            <span aria-hidden="true">Sort</span>
+            <Dropdown label="Sort" value={filters.sort} onChange={value => update({ sort: value as Filters['sort'] })} options={[{ value: 'magnitude', label: 'Magnitude' }, { value: 'position', label: 'Position' }, { value: 'rsid', label: 'rsID' }]} />
+          </div>
           <label className="check">
             <input type="checkbox" checked={filters.showZero} onChange={event => update({ showZero: event.target.checked })} />
             <span>Include magnitude 0</span>

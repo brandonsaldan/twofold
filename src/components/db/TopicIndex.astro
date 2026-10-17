@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro'
+import CheckBand from './CheckBand.astro'
+import SnpediaCredit from '../SnpediaCredit.astro'
+import Crumbs from './Crumbs.astro'
+import Finder from './Finder.astro'
+import SearchIcon from './SearchIcon.astro'
+import { loadCatalog, topicHref } from '../../lib/catalog'
+import { groupPlural, type TopicKind } from '../../lib/report'
+
+type Props = { kind: TopicKind }
+const { kind } = Astro.props
+const catalog = loadCatalog()
+const topics = catalog.topics.filter(topic => topic.kind === kind).sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base', numeric: true }))
+const heading = groupPlural[kind]
+const noun = heading.toLowerCase()
+const ledes = {
+  condition: `${topics.length.toLocaleString('en-US')} conditions with linked SNPs, from common traits to rare inherited disorders.`,
+  medicine: `${topics.length.toLocaleString('en-US')} medicines with SNPs linked to how people respond to them.`,
+  gene: `${topics.length.toLocaleString('en-US')} genes with at least one linked SNP.`
+}
+const groups = [...topics.reduce((map, topic) => {
+  const first = topic.name.charAt(0).toUpperCase()
+  const letter = /[A-Z]/.test(first) ? first : '#'
+  map.set(letter, [...(map.get(letter) || []), topic])
+  return map
+}, new Map<string, typeof topics>()).entries()].sort((a, b) => a[0] === '#' ? -1 : b[0] === '#' ? 1 : a[0].localeCompare(b[0]))
+const anchor = (letter: string) => letter === '#' ? 'other' : letter.toLowerCase()
+---
+<Base title={`${{ condition: 'Conditions and traits with genetic links', medicine: 'Pharmacogenetics: medicines and their SNPs', gene: 'Genes and their SNPs' }[kind]}, A to Z | Twofold`} description={`Browse ${topics.length.toLocaleString('en-US')} ${noun} A to Z, each with its linked SNPs and what every genotype means. Then check your own raw DNA file privately.`}>
+  <main class="db" id="main">
+    <div class="db-bar"><Crumbs items={[{ name: 'Explore', href: '/explore/' }, { name: heading }]} /></div>
+    <header class="db-head">
+      <h1>{heading}</h1>
+      <p class="db-lede">{ledes[kind]}</p>
+    </header>
+
+    <CheckBand title="Check your own raw data" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding in your file. Your file is processed in your browser and never uploaded." />
+    <div id="index">
+      <div class="filter filter-sticky" data-finder="index" hidden>
+        <label class="filter-box">
+          <SearchIcon />
+          <span class="visually-hidden">Filter {noun}</span>
+          <input type="search" data-query placeholder={`Filter ${noun}`} autocomplete="off" />
+        </label>
+        <p class="filter-status" data-status role="status"></p>
+      </div>
+      <nav class="letter-jump" aria-label="Jump to letter">
+        {groups.map(([letter]) => <a href={`#${anchor(letter)}`}>{letter}</a>)}
+      </nav>
+      {groups.map(([letter, items]) => (
+        <section class="index-group" id={anchor(letter)} data-section aria-labelledby={`${anchor(letter)}-title`}>
+          <h2 id={`${anchor(letter)}-title`}>{letter}</h2>
+          <ul class="index-list" data-list id={`${anchor(letter)}-list`}>
+            {items.map(topic => <li data-item><a href={topicHref(kind, topic.slug)}><span class="index-name">{topic.name}</span><span class="index-count">{topic.notable.length.toLocaleString('en-US')}</span></a></li>)}
+          </ul>
+        </section>
+      ))}
+      <p class="filter-empty" data-empty hidden>No matches.</p>
+    </div>
+    <p class="db-footnote db-footnote-end">Numbers count linked SNPs with their own page.</p>
+    <SnpediaCredit href="https://www.snpedia.com/" snapshotAt={catalog.snapshotAt} />
+  </main>
+  <Finder />
+</Base>

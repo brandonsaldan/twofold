@@ -1,0 +1,61 @@
+---
+import Base from '../../layouts/Base.astro'
+import CheckBand from '../../components/db/CheckBand.astro'
+import { formatDate } from '../../lib/report'
+import { loadCatalog } from '../../lib/catalog'
+
+const catalog = loadCatalog()
+const snapshot = formatDate(catalog.snapshotAt)
+const questions: Array<[string, string]> = [
+  ['Does Twofold use the same data as Promethease?', `Both are built on SNPedia, the community wiki of SNPs and genotypes. Twofold reads a snapshot of SNPedia taken ${snapshot}, so some entries may differ from what other SNPedia-based reports show.`],
+  ['Is Twofold free?', 'Yes. There is no fee, no account and no subscription, and the source code is public on GitHub.'],
+  ['Is my DNA file uploaded?', 'No. Twofold reads your file in a Web Worker inside your browser. The site has no upload endpoint, and after your first visit it works offline.'],
+  ['Which raw data files work?', 'Files from 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA and Living DNA, plus VCF files from whole genome sequencing. ZIP and GZ files can be opened without unzipping them first.'],
+  ['Can I keep my report?', 'You can save an encrypted copy in your browser with a passphrase, export your findings as CSV or JSON, or print the report.'],
+  ['Is the report a diagnosis?', 'No. SNPedia is community-edited and its entries can be incomplete or wrong. Important findings should be confirmed with a clinical test.']
+]
+---
+<Base title="Free Promethease alternative: private SNPedia report | Twofold" description="Twofold is a free, open source alternative to Promethease. It explains your 23andMe, AncestryDNA or MyHeritage raw data with SNPedia, entirely in your browser." type="article">
+  <main class="db" id="main">
+    <header class="db-head explore-head">
+      <h1>A free, private Promethease alternative</h1>
+      <p class="db-lede">Promethease builds DNA reports from SNPedia. Twofold reads the same kind of raw data file and explains it with SNPedia too, but it is free, open source and runs entirely in your browser, so your DNA file never leaves your device.</p>
+    </header>
+
+    <CheckBand title="Try it with your own file" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding. Your file is processed in your browser and never uploaded." />
+
+    <section class="db-section" aria-labelledby="compare-title">
+      <div class="db-section-head"><h2 id="compare-title">What Twofold does</h2></div>
+      <dl class="db-facts compare-facts">
+        <div><dt>Price</dt><dd>Free<span class="db-facts-sub">No account or subscription</span></dd></div>
+        <div><dt>Where your file goes</dt><dd>Nowhere<span class="db-facts-sub">Read in your browser, never uploaded</span></dd></div>
+        <div><dt>Data</dt><dd>SNPedia<span class="db-facts-sub">Snapshot taken {snapshot}</span></dd></div>
+        <div><dt>Source code</dt><dd><a href="https://github.com/brandonsaldan/twofold">Open source</a><span class="db-facts-sub">Read or audit it on GitHub</span></dd></div>
+        <div><dt>Coverage</dt><dd>{catalog.genotypeCount.toLocaleString('en-US')} genotypes<span class="db-facts-sub">Across {catalog.recordCount.toLocaleString('en-US')} SNPs, plus {catalog.genosetCount.toLocaleString('en-US')} genosets</span></dd></div>
+      </dl>
+    </section>
+
+    <section class="db-section" aria-labelledby="report-title">
+      <div class="db-section-head"><h2 id="report-title">The report</h2></div>
+      <ul class="row-points">
+        <li><strong>Ranked findings.</strong> Every match between your file and SNPedia, sorted by magnitude, with filters for repute, chromosome, topic and rare variants.</li>
+        <li><strong>Topics.</strong> Findings grouped by gene, condition and medicine, so you can follow one subject through your data.</li>
+        <li><strong>Genosets.</strong> Combinations of genotypes that SNPedia reads together, checked against your file.</li>
+        <li><strong>Strand handling.</strong> Letters from 23andMe and AncestryDNA files are matched to SNPedia's orientation, including SNPs SNPedia lists on the minus strand.</li>
+        <li><strong>A public SNP database.</strong> Every notable SNP has its own page in <a href="/explore/">Explore</a>, so you can read about a variant before or after you open your file.</li>
+      </ul>
+    </section>
+
+    <section class="db-section" aria-labelledby="faq-title">
+      <div class="db-section-head"><h2 id="faq-title">Questions</h2></div>
+      <div class="faq">
+        {questions.map(([question, answer]) => (
+          <details class="faq-item">
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </main>
+</Base>

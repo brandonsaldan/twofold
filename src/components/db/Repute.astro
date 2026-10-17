@@ -1,0 +1,7 @@
+---
+import type { Repute } from '../../lib/types'
+type Props = { repute: Repute }
+const { repute } = Astro.props
+const labels: Record<Repute, string> = { good: 'Good', bad: 'Bad', unknown: 'Not rated' }
+---
+<span class={`repute repute-${repute}`}><span class="repute-dot" aria-hidden="true"></span>{labels[repute]}</span>

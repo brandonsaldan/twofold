@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { Finding } from '../../lib/types'
-import { chromosomeOf, genotypeUrl, groupLabel, groupOf, noteSegments, pair, referenceLink, topicName, topicsOf } from '../../lib/report'
+import { chromosomeOf, genotypeUrl, groupLabel, groupOf, noteSegments, pair, populations, referenceLink, topicName, topicsOf } from '../../lib/report'
 import { Hint, Icon, Magnitude, Modal, Pair, ReputeTag, Rich } from '../ui'
 import type { ReportContext } from './Dashboard'
 
 export type Notes = { body: string; frequencies: Record<string, number[]>; genotypes: Record<string, { body: string; references: string[] }> }
 
 type Props = { finding: Finding | null; context: ReportContext; notes: Record<string, Notes> | null; notesState: 'idle' | 'loading' | 'ready' | 'error'; onClose: () => void; onTopic: (topic: string) => void }
-
-const populations: Record<string, string> = {
-  CEU: 'European ancestry (Utah)', TSI: 'Tuscan', GIH: 'Gujarati Indian', CHB: 'Han Chinese (Beijing)', CHD: 'Chinese (Denver)', HCB: 'Han Chinese (Beijing)', JPT: 'Japanese (Tokyo)', MEX: 'Mexican ancestry (Los Angeles)', MKK: 'Maasai (Kenya)', LWK: 'Luhya (Kenya)', YRI: 'Yoruba (Nigeria)', ASW: 'African ancestry (Southwest US)'
-}
 
 export default function DetailDrawer({ finding, context, notes, notesState, onClose, onTopic }: Props) {
   const [shown, setShown] = useState<Finding | null>(finding)

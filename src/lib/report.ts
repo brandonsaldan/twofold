@@ -29,7 +29,11 @@ export const groupLabel: Record<TopicGroup, string> = { gene: 'Gene', condition:
 
 export const groupPlural: Record<TopicGroup, string> = { gene: 'Genes', condition: 'Conditions', medicine: 'Medicines', collection: 'Collections' }
 
-export const chromosomeOrder = [...Array.from({ length: 22 }, (_, index) => String(index + 1)), 'X', 'Y', 'MT']
+export const populations: Record<string, string> = {
+  CEU: 'European ancestry (Utah)', TSI: 'Tuscan', GIH: 'Gujarati Indian', CHB: 'Han Chinese (Beijing)', CHD: 'Chinese (Denver)', HCB: 'Han Chinese (Beijing)', JPT: 'Japanese (Tokyo)', MEX: 'Mexican ancestry (Los Angeles)', MKK: 'Maasai (Kenya)', LWK: 'Luhya (Kenya)', YRI: 'Yoruba (Nigeria)', ASW: 'African ancestry (Southwest US)'
+}
+
+export const chromosomeOrder =[...Array.from({ length: 22 }, (_, index) => String(index + 1)), 'X', 'Y', 'MT']
 
 export const magnitudeBuckets = [0, 1, 2, 3, 4, 5, 6]
 

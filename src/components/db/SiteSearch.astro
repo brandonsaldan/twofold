@@ -1,0 +1,123 @@
+---
+import SearchIcon from './SearchIcon.astro'
+type Props = { large?: boolean }
+const { large = false } = Astro.props
+---
+<form class={large ? 'site-search is-large' : 'site-search'} role="search" action="/explore/" method="get" data-site-search>
+  <label class="site-search-box">
+    <SearchIcon />
+    <span class="visually-hidden">Search SNPs, genes, conditions and medicines</span>
+    <input type="search" name="q" role="combobox" aria-expanded="false" aria-controls="site-search-results" aria-autocomplete="list" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder={large ? 'Search an rsID, gene, condition or medicine' : 'Search rsID, gene, condition'} />
+    {large && <button class="button" type="submit">Search</button>}
+  </label>
+  <ul class="site-search-results" id="site-search-results" role="listbox" aria-label="Suggestions" hidden></ul>
+  <p class="site-search-status" role="status"></p>
+</form>
+
+<script>
+  type Entry = { label: string; meta: string; href: string; rank: number }
+  type Index = { snps: Array<[string, string]>; topics: Array<[string, string, string, number]> }
+  const plural: Record<string, string> = { gene: 'genes', condition: 'conditions', medicine: 'medicines' }
+  const kinds: Record<string, string> = { gene: 'Gene', condition: 'Condition', medicine: 'Medicine' }
+  let index: Index | null = null
+  let loading: Promise<void> | null = null
+  const load = () => {
+    loading ??= fetch('/data/search.json').then(response => response.json()).then(json => { index = json as Index }).catch(() => { loading = null })
+    return loading
+  }
+  const normalize = (value: string) => value.trim().toLowerCase().replace(/\s+/g, ' ')
+  const asId = (value: string) => /^\d+$/.test(value) ? 'rs' + value : value
+  const find = (raw: string): Entry[] => {
+    const query = normalize(raw)
+    if (!index || !query) return []
+    const id = asId(query.replace(/\s/g, ''))
+    if (/^(?:rs|i)\d+$/.test(id)) {
+      const hits: Entry[] = []
+      for (const [rsid, gene] of index.snps) if (rsid.startsWith(id)) hits.push({ label: rsid, meta: gene ? 'SNP · ' + gene : 'SNP', href: '/snps/' + rsid + '/', rank: rsid.length })
+      return hits.sort((a, b) => a.rank - b.rank || a.label.localeCompare(b.label)).slice(0, 8)
+    }
+    const hits: Entry[] = []
+    for (const [name, kind, slug, count] of index.topics) {
+      const at = name.toLowerCase().indexOf(query)
+      if (at < 0) continue
+      const word = at === 0 || name.charAt(at - 1) === ' '
+      hits.push({ label: name, meta: kinds[kind] + ' · ' + count.toLocaleString('en-US') + (count === 1 ? ' SNP' : ' SNPs'), href: '/' + plural[kind] + '/' + slug + '/', rank: (at === 0 ? 0 : word ? 100000 : 200000) - count })
+    }
+    return hits.sort((a, b) => a.rank - b.rank).slice(0, 8)
+  }
+
+  for (const form of Array.from(document.querySelectorAll<HTMLFormElement>('[data-site-search]'))) {
+    const input = form.querySelector<HTMLInputElement>('input')
+    const list = form.querySelector<HTMLUListElement>('[role="listbox"]')
+    const status = form.querySelector<HTMLElement>('[role="status"]')
+    if (!input || !list || !status) continue
+    let items: Entry[] = []
+    let active = -1
+    let open = false
+    const render = () => {
+      list.replaceChildren(...items.map((item, position) => {
+        const option = document.createElement('li')
+        option.id = 'site-search-option-' + position
+        option.setAttribute('role', 'option')
+        option.setAttribute('aria-selected', String(position === active))
+        const link = document.createElement('a')
+        link.href = item.href
+        link.tabIndex = -1
+        const label = document.createElement('span')
+        label.className = /^(?:rs|i)\d+$/.test(item.label) ? 'site-search-label mono' : 'site-search-label'
+        label.textContent = item.label
+        const meta = document.createElement('span')
+        meta.className = 'site-search-meta'
+        meta.textContent = item.meta
+        link.append(label, meta)
+        option.append(link)
+        option.addEventListener('mousemove', () => { if (active !== position) { active = position; render() } })
+        return option
+      }))
+      const visible = open && items.length > 0
+      list.hidden = !visible
+      input.setAttribute('aria-expanded', String(visible))
+      if (visible && active >= 0) input.setAttribute('aria-activedescendant', 'site-search-option-' + active)
+      else input.removeAttribute('aria-activedescendant')
+    }
+    const update = async () => {
+      const value = input.value
+      status.textContent = ''
+      if (normalize(value)) await load()
+      if (value !== input.value) return
+      items = find(value)
+      active = items.length ? 0 : -1
+      open = true
+      render()
+    }
+    input.addEventListener('focus', () => { load(); if (items.length) { open = true; render() } })
+    input.addEventListener('input', update)
+    input.addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown' && items.length) { event.preventDefault(); active = (active + 1) % items.length; open = true; render() }
+      else if (event.key === 'ArrowUp' && items.length) { event.preventDefault(); active = (active - 1 + items.length) % items.length; render() }
+      else if (event.key === 'Escape') { open = false; render() }
+    })
+    document.addEventListener('click', event => { if (!form.contains(event.target as Node)) { open = false; render() } })
+    form.addEventListener('submit', async event => {
+      event.preventDefault()
+      await load()
+      if (!index) { status.textContent = 'Search needs a connection the first time.'; return }
+      items = find(input.value)
+      const target = items[active >= 0 ? active : 0]
+      const id = asId(normalize(input.value).replace(/\s/g, ''))
+      if (target && (!/^(?:rs|i)\d+$/.test(id) || target.label === id)) { window.location.href = target.href; return }
+      if (/^(?:rs|i)\d+$/.test(id)) {
+        const link = document.createElement('a')
+        link.href = 'https://www.snpedia.com/index.php/' + id
+        link.textContent = 'Open ' + id + ' on SNPedia'
+        status.replaceChildren('No page for ' + id + '. Pages cover SNPs with a notable genotype or detailed notes. ', link)
+        open = false
+        render()
+        return
+      }
+      status.textContent = normalize(input.value) ? 'No matches.' : ''
+    })
+    const initial = new URLSearchParams(window.location.search).get('q')
+    if (initial && form.classList.contains('is-large')) { input.value = initial; update() }
+  }
+</script>

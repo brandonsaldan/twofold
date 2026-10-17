@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import type { Repute } from '../lib/types'
 import { reputeLabel, type Segment } from '../lib/report'
 
@@ -66,4 +66,79 @@ export function Icon({ name }: { name: 'close' | 'search' | 'back' | 'print' | '
     file: 'M5 2.5h6.5L15 6v11.5H5zM11.5 2.5V6H15'
   }
   return <svg className="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d={paths[name]} /></svg>
+}
+
+export type DropdownOption = { value: string; label: string; group?: string }
+
+export function Dropdown({ label, value, options, onChange }: { label: string; value: string; options: DropdownOption[]; onChange: (value: string) => void }) {
+  const id = useId()
+  const root = useRef<HTMLDivElement | null>(null)
+  const button = useRef<HTMLButtonElement | null>(null)
+  const list = useRef<HTMLUListElement | null>(null)
+  const [open, setOpen] = useState(false)
+  const [active, setActive] = useState(0)
+  const typed = useRef({ text: '', at: 0 })
+  const current = Math.max(0, options.findIndex(option => option.value === value))
+
+  useEffect(() => {
+    if (!open) return
+    const close = (event: MouseEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false) }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    list.current?.focus()
+    list.current?.querySelector<HTMLElement>(`[data-index="${active}"]`)?.scrollIntoView({ block: 'nearest' })
+  }, [open, active])
+
+  const show = (index = current) => { setActive(index); setOpen(true) }
+  const choose = (index: number) => {
+    const option = options[index]
+    if (option) onChange(option.value)
+    setOpen(false)
+    button.current?.focus()
+  }
+  const jump = (key: string) => {
+    const now = Date.now()
+    typed.current = { text: now - typed.current.at > 700 ? key : typed.current.text + key, at: now }
+    const query = typed.current.text.toLowerCase()
+    const start = typed.current.text.length > 1 ? active : active + 1
+    const order = [...options.keys()].map(offset => (start + offset) % options.length)
+    const found = order.find(index => options[index].label.toLowerCase().startsWith(query))
+    if (found !== undefined) setActive(found)
+  }
+  const onButtonKey = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) { event.preventDefault(); show() }
+  }
+  const onListKey = (event: KeyboardEvent<HTMLUListElement>) => {
+    if (event.key === 'ArrowDown') { event.preventDefault(); setActive(index => Math.min(options.length - 1, index + 1)) }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); setActive(index => Math.max(0, index - 1)) }
+    else if (event.key === 'Home') { event.preventDefault(); setActive(0) }
+    else if (event.key === 'End') { event.preventDefault(); setActive(options.length - 1) }
+    else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(active) }
+    else if (event.key === 'Escape') { event.preventDefault(); setOpen(false); button.current?.focus() }
+    else if (event.key === 'Tab') setOpen(false)
+    else if (event.key.length === 1 && !event.metaKey && !event.ctrlKey) jump(event.key)
+  }
+
+  return (
+    <div className={open ? 'dropdown is-open' : 'dropdown'} ref={root}>
+      <button ref={button} type="button" className="dropdown-button" id={`${id}-button`} aria-haspopup="listbox" aria-expanded={open} aria-labelledby={`${id}-label ${id}-button`} onClick={() => (open ? setOpen(false) : show())} onKeyDown={onButtonKey}>
+        <span className="visually-hidden" id={`${id}-label`}>{label}</span>
+        <span className="dropdown-value">{options[current]?.label}</span>
+      </button>
+      {open && (
+        <ul ref={list} className="dropdown-list" role="listbox" tabIndex={-1} aria-labelledby={`${id}-label`} aria-activedescendant={`${id}-option-${active}`} onKeyDown={onListKey}>
+          {options.map((option, index) => (
+            <li key={`${option.group || ''}-${option.value}`} role="presentation">
+              {option.group && option.group !== options[index - 1]?.group && <span className="dropdown-group" aria-hidden="true">{option.group}</span>}
+              <span role="option" id={`${id}-option-${index}`} data-index={index} aria-selected={index === current} className={index === active ? 'dropdown-option is-active' : 'dropdown-option'} onMouseMove={() => active !== index && setActive(index)} onClick={() => choose(index)}>{option.label}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
 }

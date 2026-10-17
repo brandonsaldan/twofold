@@ -1,0 +1,141 @@
+---
+import Base from '../../layouts/Base.astro'
+import SnpediaCredit from '../SnpediaCredit.astro'
+import DbBar from './DbBar.astro'
+import CheckBand from './CheckBand.astro'
+import Finder from './Finder.astro'
+import SearchIcon from './SearchIcon.astro'
+import ReputeTag from './Repute.astro'
+import { describe, filePair, genotypeHref, importance, kindPath, snpHref, topicHref, type TopicEntry } from '../../lib/catalog'
+import { count, groupLabel, groupPlural, snpediaUrl } from '../../lib/report'
+
+type Props = { topic: TopicEntry; snapshotAt: string; minimum: number }
+const { topic, snapshotAt, minimum } = Astro.props
+const { name, kind, notable, others, genosets, genes, related, documented, notableCount } = topic
+const total = notable.length + others.length
+const geneCount = new Set(notable.map(entry => entry.snp.gene).filter(Boolean)).size
+const titles = { gene: `${name} gene: SNPs, genotypes and raw data`, condition: `${name} genetics: SNPs and genotypes`, medicine: `${name} pharmacogenetics: SNPs and genotypes` }
+const subject = { gene: `the ${name} gene`, condition: name, medicine: `${name} response` }[kind]
+const highlights = notable.slice(0, 3).map(entry => entry.snp.rsid).join(', ')
+const description = describe(`${count(total, 'SNP')} ${kind === 'gene' ? 'in' : 'linked to'} ${subject}, including ${highlights}.`, 'See what each genotype means and check your own raw DNA file privately.')
+const lede = kind === 'gene'
+  ? `${count(total, 'SNP')} in the ${name} gene, ${notableCount.toLocaleString('en-US')} with a genotype of magnitude ${minimum} or higher.`
+  : `${count(total, 'SNP')} linked to ${subject}${geneCount > 1 ? ` across ${geneCount} genes` : ''}, ${notableCount.toLocaleString('en-US')} with a genotype of magnitude ${minimum} or higher.`
+const crumbs = [{ name: 'Explore', href: '/explore/' }, { name: groupPlural[kind], href: kindPath(kind) }, { name }]
+const searchable = notable.length > 12
+---
+<Base title={`${titles[kind]} | Twofold`} description={description} type="article" noindex={!topic.indexed}>
+  <main class="db" id="main">
+    <DbBar items={crumbs} />
+
+    <header class="db-head">
+      <h1>{name}</h1>
+      <p class="db-lede">{lede}</p>
+    </header>
+
+    <dl class="db-facts">
+      <div><dt>Type</dt><dd><a href={kindPath(kind)}>{groupLabel[kind]}</a></dd></div>
+      <div><dt>SNPs</dt><dd>{total.toLocaleString('en-US')}</dd></div>
+      <div><dt>Notable</dt><dd>{notableCount.toLocaleString('en-US')}<span class="db-facts-sub">Magnitude {minimum} or higher</span></dd></div>
+      <div><dt>Well documented</dt><dd>{documented.toLocaleString('en-US')}</dd></div>
+      {kind === 'gene' ? <div><dt>Genosets</dt><dd>{genosets.length}</dd></div> : <div><dt>Genes</dt><dd>{geneCount.toLocaleString('en-US')}</dd></div>}
+    </dl>
+
+    <CheckBand title={`Check your raw data for ${name}`} text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see which of these genotypes you carry. Your file is processed in your browser and never uploaded." />
+
+    <section class="db-section" id="snps" aria-labelledby="snps-title">
+      <div class="db-section-head">
+        <h2 id="snps-title">{kind === 'gene' ? `${name} SNPs` : 'Linked SNPs'}</h2>
+        <p>Every genotype, as shown in 23andMe and AncestryDNA files.</p>
+      </div>
+      {searchable && (
+        <div class="filter" data-finder="snps" hidden>
+          <label class="filter-box">
+            <SearchIcon />
+            <span class="visually-hidden">Filter SNPs</span>
+            <input type="search" data-query placeholder="Filter by rsID, gene or keyword" autocomplete="off" />
+          </label>
+          <p class="filter-status" data-status role="status"></p>
+        </div>
+      )}
+      <ul class="snp-list" id="snp-list" data-list data-limit="20">
+        {notable.map(entry => (
+          <li class="snp-card" data-item>
+            <div class="snp-card-head">
+              <a class="snp-card-id mono" href={snpHref(entry.snp.rsid)}>{entry.snp.rsid}</a>
+              {kind !== 'gene' && entry.snp.gene && <span class="snp-card-gene">{entry.snp.gene}</span>}
+              <span class="snp-card-level">{importance(entry.top.magnitude)}</span>
+            </div>
+            <ul class="geno-rows">
+              {entry.snp.genotypes.map(genotype => (
+                <li>
+                  <a class={genotype === entry.top ? 'geno-row is-top' : 'geno-row'} href={genotypeHref(entry, genotype.alleles)}>
+                    <span class="geno-row-pair mono">{filePair(entry.snp, genotype.alleles)}</span>
+                    <span class="geno-row-text">{genotype.summary || 'No summary available.'}</span>
+                    <ReputeTag repute={genotype.repute} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+      <p class="filter-empty" data-empty hidden>No matches.</p>
+      <button type="button" class="button button-quiet db-show" data-more="snp-list" hidden>Show all</button>
+    </section>
+
+    {(genes.length > 0 || related.length > 0 || genosets.length > 0) && (
+      <section class="db-section" aria-labelledby="related-title">
+        <div class="db-section-head"><h2 id="related-title">Related</h2></div>
+        {genes.length > 0 && (
+          <div class="db-group">
+            <h3>Genes</h3>
+            <ul class="chip-list">
+              {genes.map(item => <li>{item.slug ? <a class="chip" href={topicHref('gene', item.slug)}>{item.name}<span>{item.count}</span></a> : <span class="chip is-plain">{item.name}<span>{item.count}</span></span>}</li>)}
+            </ul>
+          </div>
+        )}
+        {related.length > 0 && (
+          <div class="db-group">
+            <h3>{kind === 'gene' ? 'Conditions and medicines' : 'Related topics'}</h3>
+            <ul class="chip-list">
+              {related.map(item => <li><a class="chip" href={topicHref(item.kind, item.slug!)}>{item.name}<span>{groupLabel[item.kind]}</span></a></li>)}
+            </ul>
+          </div>
+        )}
+        {genosets.length > 0 && (
+          <div class="db-group">
+            <h3>Genosets</h3>
+            <ul class="db-row-list">
+              {genosets.map(set => (
+                <li>
+                  <a class="db-row" href={snpediaUrl(set.title)}>
+                    <span class="db-row-id mono">{set.title}</span>
+                    <span class="db-row-text">{set.summary || 'No summary available.'}</span>
+                    <span class="db-row-side">{importance(set.magnitude)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p class="db-footnote">Genosets combine several genotypes. Twofold checks them in your report.</p>
+          </div>
+        )}
+      </section>
+    )}
+
+    {others.length > 0 && (
+      <section class="db-section" aria-labelledby="others-title">
+        <div class="db-section-head"><h2 id="others-title">Other SNPs</h2><p>No notable genotype or detailed notes</p></div>
+        <details class="db-notes">
+          <summary>Show {count(others.length, 'SNP')}</summary>
+          <ul class="id-list">
+            {others.map(rsid => <li><a class="mono" href={snpediaUrl(rsid)}>{rsid}</a></li>)}
+          </ul>
+        </details>
+      </section>
+    )}
+
+    <SnpediaCredit href={snpediaUrl(name)} label={name} snapshotAt={snapshotAt} />
+  </main>
+  <Finder />
+</Base>

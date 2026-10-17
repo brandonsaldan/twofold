@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro'
+import SiteSearch from '../components/db/SiteSearch.astro'
+---
+<Base title="Page not found | Twofold" description="This page does not exist. Search the Twofold SNP database or open your raw DNA file." noindex>
+  <main class="db" id="main">
+    <header class="db-head explore-head">
+      <h1>Page not found</h1>
+      <p class="db-lede">This page does not exist, or it moved. Search for an rsID, gene, condition or medicine, or go back to the <a href="/">start page</a>.</p>
+      <SiteSearch large />
+    </header>
+  </main>
+</Base>
