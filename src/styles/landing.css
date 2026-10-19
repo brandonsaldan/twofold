@@ -894,6 +894,10 @@
   max-width: var(--measure);
 }
 
+.page.is-wide > .note {
+  max-width: none;
+}
+
 
 .page h1 {
   margin: 0;

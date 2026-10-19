@@ -7,7 +7,7 @@ export const supportLinks: SupportLink[] = [
 ]
 
 export const supportCopy = {
-  lead: 'Twofold is free, with no ads, accounts or tracking. If it was useful to you, you can chip in to support its development.',
+  lead: "Twofold is free, with no ads, accounts or tracking. If you'd like, you can chip in to support its development.",
   note: 'Donations are optional and never unlock features. They are handled by a third-party site, which never sees your DNA file or report.',
   tag: 'Twofold'
 }
