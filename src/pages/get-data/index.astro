@@ -1,9 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro'
+import InfoPage from '../../components/InfoPage.astro'
 ---
 <Base title="Download your raw DNA data: 23andMe, AncestryDNA and more | Twofold" description="How to download your raw DNA data file from 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA, Living DNA and whole genome sequencing services.">
-  <main class="page" id="main">
-    <h1>Get your raw data</h1>
+  <InfoPage>
+    <h1>Get your Raw Data</h1>
     <p class="lede">Twofold reads the raw DNA file that your testing service lets you download. Here is where to find it for each service.</p>
     <p class="note">Choose the file itself, including a ZIP or GZ archive. Twofold reads common 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA, Living DNA and VCF formats. A provider may change its download steps or file format, so use its current help page if the menu looks different.</p>
     <h2 id="23andme">23andMe</h2>
@@ -24,8 +25,8 @@ import Base from '../../layouts/Base.astro'
       <li>Sequencing.com: choose Files in the header, select your genome, then click the download arrow next to the .vcf file. <a href="https://biodecode.com/articles/download-your-raw-dna-data/">Steps for several providers</a>.</li>
       <li>Nebula Genomics and DNA Complete: download the VCF from your account. Nebula has no public help page, so contact their support if you cannot find it.</li>
     </ul>
-    <h2>Opening the file</h2>
+    <h2 id="opening">Opening the file</h2>
     <p>Choose the downloaded file on the start page. There is no need to unzip it first. Twofold reads it in your browser and never uploads it. Keep the file somewhere private, since it is sensitive personal information.</p>
     <p><a class="button" href="/">Open your file</a></p>
-  </main>
+  </InfoPage>
 </Base>

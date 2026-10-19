@@ -1,19 +1,20 @@
 ---
 import Base from '../../layouts/Base.astro'
+import InfoPage from '../../components/InfoPage.astro'
 ---
 <Base title="Privacy: your DNA file never leaves your browser | Twofold" description="How Twofold reads raw DNA data entirely in your browser, with no upload, account or analytics, and how to verify it yourself.">
-  <main class="page" id="main">
+  <InfoPage>
     <h1>Privacy</h1>
     <p class="lede">Your DNA file is processed in a Web Worker in your browser. Twofold has no upload endpoint, account system or analytics.</p>
-    <h2>What the browser downloads</h2>
+    <h2 id="downloads">What the browser downloads</h2>
     <p>Every visitor receives the same app files and SNPedia reference snapshot. The app asks its own site for fixed data files. It never chooses a network address based on an rsID, genotype, search term or result in your file.</p>
     <p>A strict Content Security Policy limits app connections, scripts, styles, fonts and images to this site. The policy includes <code>connect-src 'self'</code>. Fonts are bundled here. A service worker caches the app and reference data so it works offline after the first complete visit.</p>
-    <h2>What stays on your device</h2>
+    <h2 id="on-device">What stays on your device</h2>
     <p>The raw file and derived report live in memory by default. Closing the tab forgets them. If you choose Save on this device, only the derived report is stored in your browser's IndexedDB, encrypted with a passphrase using PBKDF2 and AES-GCM. The raw file is never saved by Twofold.</p>
     <p>To remove a saved report, use Delete the saved report on the start page or Delete saved copy in the save dialog. Clearing this site's data in your browser also removes it. If you forget your passphrase, the saved report cannot be recovered.</p>
-    <h2>Check it yourself</h2>
+    <h2 id="check">Check it yourself</h2>
     <ol><li>Load Twofold once while connected, and wait for the app to finish caching.</li><li>Open your browser's developer tools and select the Network panel.</li><li>Turn off Wi-Fi or set the browser to Offline.</li><li>Open a sample or your own file. The report should still work without new network requests.</li></ol>
     <p class="note">If you choose to follow an external source link, your browser visits that site. Twofold does not open those links automatically.</p>
     <p><a class="button" href="/">Open your file</a></p>
-  </main>
+  </InfoPage>
 </Base>

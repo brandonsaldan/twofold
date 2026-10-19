@@ -1,23 +1,24 @@
 ---
 import Base from '../../layouts/Base.astro'
+import InfoPage from '../../components/InfoPage.astro'
 import SupportOptions from '../../components/SupportOptions'
 import { supportCopy, supportLinks } from '../../lib/support'
 ---
 <Base title="Support Twofold, a free and open source DNA explorer | Twofold" description="Twofold is free, with no ads, accounts or tracking. Here is how to support its development with a donation or other help.">
-  <main class="page" id="main">
+  <InfoPage layout="wide">
     <h1>Support Twofold</h1>
     <p class="lede">{supportCopy.lead}</p>
     {supportLinks.length > 0 && <>
-      <h2>Donate</h2>
-      <SupportOptions client:load />
+      <h2 id="donate">Donate</h2>
+      <SupportOptions client:load cards />
       <p class="note">{supportCopy.note}</p>
     </>}
-    <h2>Other ways to help</h2>
-    <ul>
-      <li>Star or share <a href="https://github.com/brandonsaldan/twofold">Twofold on GitHub</a> so more people can find it.</li>
-      <li>Report a bug or suggest an improvement by <a href="https://github.com/brandonsaldan/twofold/issues">opening an issue</a>.</li>
-      <li>Tell someone who has a DNA test and never looked past the company's own report.</li>
-      <li>Improve the entries Twofold relies on by contributing to <a href="https://www.snpedia.com/">SNPedia</a>.</li>
+    <h2 id="other-ways">Other ways to help</h2>
+    <ul class="help-grid">
+      <li><p class="help-title">Share it</p><p>Star or share <a href="https://github.com/brandonsaldan/twofold">Twofold on GitHub</a> so more people can find it.</p></li>
+      <li><p class="help-title">Report a bug</p><p>Found a problem or have an idea? <a href="https://github.com/brandonsaldan/twofold/issues">Open an issue</a> on GitHub.</p></li>
+      <li><p class="help-title">Tell a friend</p><p>Know someone with a DNA test who never looked past the company's own report? Send them here.</p></li>
+      <li><p class="help-title">Improve SNPedia</p><p>Every finding comes from <a href="https://www.snpedia.com/">SNPedia</a>, a community wiki anyone can contribute to.</p></li>
     </ul>
-  </main>
+  </InfoPage>
 </Base>

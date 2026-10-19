@@ -1,18 +1,19 @@
 ---
 import Base from '../../layouts/Base.astro'
+import InfoPage from '../../components/InfoPage.astro'
 ---
 <Base title="About Twofold, a free SNPedia DNA report | Twofold" description="About Twofold, formerly GeneCodex: a free, open source tool that explains raw DNA data with SNPedia, its data sources and licenses.">
-  <main class="page" id="main">
+  <InfoPage>
     <h1>About Twofold</h1>
     <p class="lede">Twofold compares a raw DNA file with a dated copy of SNPedia, entirely in your browser. It's a free, open source project by <a href="https://brandonsaldan.com">Brandon Saldan</a>, first released as GeneCodex in 2023.</p>
-    <h2>What the results mean</h2>
+    <h2 id="results">What the results mean</h2>
     <p>Many genetic associations are uncertain, population-specific or later revised. SNPedia's magnitude is a community rating of interest, not a risk score. Good and bad are community labels. A single genotype does not diagnose a condition or tell your whole story.</p>
     <p>Consumer genotyping chips can produce false positive calls for very rare variants. Important findings should be confirmed through clinical testing before you act on them. See <a href="https://www.bmj.com/content/372/bmj.n214">Weedon and colleagues, BMJ 2021</a>.</p>
     <p>Every notable SNP also has its own page in the <a href="/explore/">SNP database</a>, and if you have used Promethease before, <a href="/promethease-alternative/">here is how Twofold compares</a>.</p>
-    <h2>Credits and licenses</h2>
+    <h2 id="credits">Credits and licenses</h2>
     <p>Genetic annotations come from <a href="https://www.snpedia.com/">SNPedia</a>, a community wiki. SNPedia content and the derived reference dataset are shared under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/us/">CC BY-NC-SA 3.0 US</a>. Source entries can be read on SNPedia. The app's own source code is available under its repository license.</p>
     <p>Twofold uses self-hosted Newsreader, Schibsted Grotesk and IBM Plex Mono fonts.</p>
-    <h2>Source code</h2>
+    <h2 id="source">Source code</h2>
     <p><a href="https://github.com/brandonsaldan/twofold">View Twofold on GitHub</a>. The repository includes the file parser, the SNPedia data builder and the tests.</p>
-  </main>
+  </InfoPage>
 </Base>

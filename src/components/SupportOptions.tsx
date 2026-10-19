@@ -40,7 +40,7 @@ export function SupportNote({ link, titleId, onBack, onContinue }: { link: Suppo
   )
 }
 
-export default function SupportOptions({ onLeave, onShared }: { onLeave?: () => void; onShared?: (link: SupportLink) => void }) {
+export default function SupportOptions({ onLeave, onShared, cards = false }: { onLeave?: () => void; onShared?: (link: SupportLink) => void; cards?: boolean }) {
   const id = useId()
   const [pending, setPending] = useState<SupportLink | null>(null)
   const [mounted, setMounted] = useState(false)
@@ -50,13 +50,15 @@ export default function SupportOptions({ onLeave, onShared }: { onLeave?: () => 
 
   return (
     <>
-      <ul className="support-options">
+      <ul className={cards ? 'support-cards' : 'support-options'}>
         {supportLinks.map(link => (
           <li key={link.href}>
             <a href={link.href} target="_blank" rel="noopener noreferrer" onClick={event => { if (link.shared) { event.preventDefault(); choose(link) } else leave() }}>
               <span className="support-name">{link.name}</span>
-              <span className="support-host">{supportHost(link.href)}</span>
-              <Icon name="arrow" />
+              {cards ? <span className="support-foot"><span className="support-host">{supportHost(link.href)}</span><Icon name="arrow" /></span> : <>
+                <span className="support-host">{supportHost(link.href)}</span>
+                <Icon name="arrow" />
+              </>}
             </a>
           </li>
         ))}

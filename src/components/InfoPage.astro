@@ -1,0 +1,52 @@
+---
+type Props = { layout?: 'single' | 'wide' }
+const { layout = 'single' } = Astro.props
+const html = await Astro.slots.render('default')
+const outline = layout === 'single' ? [...html.matchAll(/<h2\b[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/g)].map(([, id, title]) => ({ id, title: title.replace(/<[^>]+>/g, '').trim() })) : []
+const panel = outline.length >= 3
+---
+<main class:list={['page-wrap', { 'has-panel': panel }]} id="main">
+  <div class:list={['page', { 'is-wide': layout === 'wide' }]}><Fragment set:html={html} /></div>
+  {panel && (
+    <aside class="page-panel" aria-label="Page tools">
+      <nav class="page-outline" aria-label="On this page">
+        <p class="page-outline-label">On this page</p>
+        <ol>
+          {outline.map((item, index) => (
+            <li>
+              <a href={`#${item.id}`}>
+                <span class="page-outline-title" set:html={item.title} />
+                <span class="page-outline-leader" aria-hidden="true" />
+                <span class="page-outline-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <div class="aside-check">
+        <div>
+          <p class="aside-check-title">Check your own raw data</p>
+          <p>See every notable finding in your file. It's read in your browser and never uploaded.</p>
+        </div>
+        <a class="button" href="/">Open your file</a>
+      </div>
+    </aside>
+  )}
+</main>
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.page-outline a')]
+  const pairs = links.map(link => ({ link, section: document.getElementById(decodeURIComponent(link.hash.slice(1))) })).filter(pair => pair.section)
+  let frame = 0
+  const update = () => {
+    frame = 0
+    let current = 0
+    pairs.forEach((pair, index) => { if (pair.section!.getBoundingClientRect().top <= 160) current = index })
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = pairs.length - 1
+    pairs.forEach((pair, index) => { if (index === current) pair.link.setAttribute('aria-current', 'location'); else pair.link.removeAttribute('aria-current') })
+  }
+  if (pairs.length) {
+    update()
+    window.addEventListener('scroll', () => { if (!frame) frame = requestAnimationFrame(update) }, { passive: true })
+    window.addEventListener('resize', update)
+  }
+</script>
