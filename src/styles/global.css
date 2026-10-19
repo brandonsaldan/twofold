@@ -603,6 +603,12 @@ html:has(.modal[open]) {
   font-size: 0.8125rem;
 }
 
+@media (max-width: 640px) {
+  .nav-support {
+    display: none;
+  }
+}
+
 @media (max-width: 520px) {
   .nav-about {
     display: none;
@@ -631,4 +637,101 @@ html:has(.modal[open]) {
     animation-duration: 0s !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+.support-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.support-options {
+  margin: 0 0 16px;
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-small);
+  list-style: none;
+}
+
+.support-options li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.support-options a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 14px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background var(--fast);
+}
+
+.support-options li:first-child a {
+  border-radius: var(--radius-small) var(--radius-small) 0 0;
+}
+
+.support-options li:last-child a {
+  border-radius: 0 0 var(--radius-small) var(--radius-small);
+}
+
+.support-options a:hover {
+  background: var(--sunken);
+}
+
+.support-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.support-host {
+  margin-left: auto;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.support-options .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transition: transform var(--fast), color var(--fast);
+}
+
+.support-options a:hover .icon {
+  color: var(--ink);
+  transform: translateX(2px);
+}
+
+.modal .support-note {
+  font-size: 0.8125rem;
+}
+
+.support-tag-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-small);
+  background: var(--paper);
+}
+
+.support-tag-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.support-tag-label {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.support-tag-value {
+  font-family: var(--mono);
+  font-size: 0.9375rem;
 }

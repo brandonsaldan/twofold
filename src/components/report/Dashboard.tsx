@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { Finding } from '../../lib/types'
 import { forgetReport, saveReport } from '../../lib/storage'
 import { download, toCsv, toJson, type ReportData, type ReportMeta } from '../../lib/report'
+import { supportCopy, supportLinks, type SupportLink } from '../../lib/support'
+import SupportOptions, { SupportNote } from '../SupportOptions'
 import { Icon, Modal } from '../ui'
 import Overview from './Overview'
 import FindingsView, { emptyFilters, type Filters } from './FindingsView'
@@ -22,7 +24,7 @@ export type ReportContext = {
 }
 
 type Props = { report: ReportData; meta: ReportMeta; saved: boolean; setSaved: (value: boolean) => void; onClose: () => void }
-type DialogName = 'save' | 'print' | 'close' | 'export' | null
+type DialogName = 'save' | 'print' | 'close' | 'export' | 'support' | null
 type ExportFormat = 'csv' | 'json'
 type LongText = { snps: Record<string, Notes> }
 
@@ -44,6 +46,9 @@ export default function Dashboard({ report, meta, saved, setSaved, onClose }: Pr
   const [filters, setFilters] = useState<Filters>(emptyFilters)
   const [selected, setSelected] = useState<Finding | null>(null)
   const [dialog, setDialog] = useState<DialogName>(null)
+  const [supportLink, setSupportLink] = useState<SupportLink | null>(null)
+  const openSupport = () => { setSupportLink(null); setDialog('support') }
+  const closeSupport = () => setDialog(null)
   const [notes, setNotes] = useState<{ state: 'idle' | 'loading' | 'ready' | 'error'; data: LongText | null }>({ state: 'idle', data: null })
   const [printing, setPrinting] = useState<PrintOptions | null>(null)
   const [format, setFormat] = useState<ExportFormat>('csv')
@@ -138,9 +143,18 @@ export default function Dashboard({ report, meta, saved, setSaved, onClose }: Pr
         <div className="rail-actions">{actions}</div>
         <details className="rail-menu">
           <summary>Save, print and export</summary>
-          <div className="rail-menu-body">{actions}</div>
+          <div className="rail-menu-body">
+            {actions}
+            {supportLinks.length > 0 && <button type="button" className="rail-action rail-action-support" onClick={openSupport}><Icon name="heart" />Support Twofold</button>}
+          </div>
         </details>
         <p className="rail-note">{meta.sample ? 'A made-up genome built from SNPedia population frequencies.' : saved ? 'An encrypted copy is saved in this browser.' : 'Not saved. Closing this tab clears the report.'}</p>
+        {supportLinks.length > 0 && (
+          <div className="rail-support">
+            <p>Twofold is free and open source, with no ads or tracking.</p>
+            <button type="button" className="rail-support-button" onClick={openSupport}><Icon name="heart" />Support Twofold</button>
+          </div>
+        )}
       </aside>
 
       <main className="dash-main" id="report-main" tabIndex={-1}>
@@ -166,6 +180,18 @@ export default function Dashboard({ report, meta, saved, setSaved, onClose }: Pr
       </Modal>
 
       <PrintDialog open={dialog === 'print'} context={context} onClose={() => setDialog(null)} onPrint={options => { setDialog(null); setPrinting(options) }} />
+
+      <Modal open={dialog === 'support'} onClose={closeSupport} labelledBy="support-title" className="modal-small">
+        {supportLink ? <SupportNote key={supportLink.href} link={supportLink} titleId="support-title" onBack={() => setSupportLink(null)} onContinue={closeSupport} /> : <>
+          <h2 id="support-title">Support Twofold</h2>
+          <p>{supportCopy.lead}</p>
+          <SupportOptions onLeave={closeSupport} onShared={setSupportLink} />
+          <p className="support-note">{supportCopy.note} Links open in a new tab, so your report stays open here.</p>
+          <div className="modal-actions">
+            <button type="button" className="button button-quiet" onClick={closeSupport}>Not now</button>
+          </div>
+        </>}
+      </Modal>
 
       <Modal open={dialog === 'close'} onClose={() => setDialog(null)} labelledBy="close-title" className="modal-small">
         <h2 id="close-title">Close this report?</h2>

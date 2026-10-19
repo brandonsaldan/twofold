@@ -44,8 +44,8 @@ export function Modal({ open, onClose, labelledBy, className = '', children }: {
       ref={dialog}
       className={`modal ${className}`}
       aria-labelledby={labelledBy}
-      onClose={onClose}
-      onCancel={event => { event.preventDefault(); onClose() }}
+      onClose={event => { if (event.target === event.currentTarget) onClose() }}
+      onCancel={event => { if (event.target !== event.currentTarget) return; event.preventDefault(); onClose() }}
       onClick={event => { if (event.target === event.currentTarget) onClose() }}
     >
       <div className="modal-body">{children}</div>
@@ -53,7 +53,7 @@ export function Modal({ open, onClose, labelledBy, className = '', children }: {
   )
 }
 
-export function Icon({ name }: { name: 'close' | 'search' | 'back' | 'print' | 'download' | 'lock' | 'exit' | 'arrow' | 'file' }) {
+export function Icon({ name }: { name: 'close' | 'search' | 'back' | 'print' | 'download' | 'lock' | 'exit' | 'arrow' | 'file' | 'heart' }) {
   const paths: Record<typeof name, string> = {
     close: 'M5 5l10 10M15 5L5 15',
     search: 'M8.5 14a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM12.5 12.5L17 17',
@@ -63,7 +63,8 @@ export function Icon({ name }: { name: 'close' | 'search' | 'back' | 'print' | '
     lock: 'M5 9h10v8H5zM7 9V6.5a3 3 0 0 1 6 0V9',
     exit: 'M8 4H4v12h4M12 6l4 4-4 4M16 10H8',
     arrow: 'M4 10h12M11 5l5 5-5 5',
-    file: 'M5 2.5h6.5L15 6v11.5H5zM11.5 2.5V6H15'
+    file: 'M5 2.5h6.5L15 6v11.5H5zM11.5 2.5V6H15',
+    heart: 'M10 16.5s-6.5-3.7-6.5-8.3A3.2 3.2 0 0 1 10 6.2a3.2 3.2 0 0 1 6.5 2c0 4.6-6.5 8.3-6.5 8.3z'
   }
   return <svg className="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d={paths[name]} /></svg>
 }

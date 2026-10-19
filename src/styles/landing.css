@@ -743,25 +743,24 @@
 
 .page {
   max-width: var(--measure);
-  padding: clamp(40px, 7vw, 72px) 0 8px;
+  padding-block: 52px 16px;
 }
 
 .page h1 {
-  margin: 0 0 20px;
+  margin: 0;
   font-family: var(--serif);
-  font-size: clamp(2.3rem, 4.6vw, 3.4rem);
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
   font-weight: 500;
   line-height: 1.05;
   letter-spacing: -0.03em;
 }
 
 .page h2 {
-  margin: 44px 0 12px;
-  padding-top: 22px;
-  border-top: 1px solid var(--rule);
+  margin: 56px 0 18px;
   font-family: var(--serif);
-  font-size: 1.55rem;
+  font-size: clamp(1.4rem, 2.2vw, 1.6rem);
   font-weight: 500;
+  line-height: 1.2;
   letter-spacing: -0.015em;
   scroll-margin-top: 24px;
 }
@@ -779,12 +778,26 @@
 
 .page .lede {
   max-width: none;
+  margin: 16px 0 0;
+  font-size: clamp(1.12rem, 1.6vw, 1.28rem);
+  line-height: 1.55;
+}
+
+.page .lede + .note {
+  margin-top: 24px;
 }
 
 .page .note {
   color: var(--muted);
   font-family: var(--sans);
   font-size: 0.875rem;
+}
+
+.page .support-options li {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .page code {
@@ -1057,4 +1070,10 @@
   margin: 20px 0 0;
   color: var(--muted);
   font-size: 0.9375rem;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding-top: 44px;
+  }
 }

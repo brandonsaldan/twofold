@@ -11,7 +11,7 @@ export function sitemapPaths(name: SitemapName): Array<{ path: string; lastmod: 
   if (name === 'pages') {
     const chromosomes = [...new Set(indexed.map(entry => chromosomeOrder.includes(chromosomeOf(entry.snp)) ? chromosomeOf(entry.snp) : ''))].map(chromosomeHref)
     return [
-      ...['/', '/get-data/', '/privacy/', '/about/', '/promethease-alternative/'].map(path => ({ path, lastmod: '' })),
+      ...['/', '/get-data/', '/privacy/', '/about/', '/support/', '/promethease-alternative/'].map(path => ({ path, lastmod: '' })),
       ...['/explore/', '/snps/', ...chromosomes, kindPath('condition'), kindPath('medicine'), kindPath('gene')].map(path => ({ path, lastmod }))
     ]
   }

@@ -116,6 +116,54 @@
   line-height: 1.5;
 }
 
+.rail-support {
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rail-support p {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.rail-support-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background var(--fast), border-color var(--fast);
+}
+
+.rail-support-button:hover {
+  background: var(--sunken);
+  border-color: var(--ink);
+}
+
+.rail-support-button .icon,
+.rail-action-support .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--bad);
+  transition: fill var(--fast);
+}
+
+.rail-support-button:hover .icon {
+  fill: currentColor;
+}
+
 .dash-main {
   min-width: 0;
   outline: none;
@@ -1433,7 +1481,8 @@ button.kpi:hover {
     box-shadow: inset 0 -2px 0 var(--ink);
   }
 
-  .rail-actions {
+  .rail-actions,
+  .rail-support {
     display: none;
   }
 
