@@ -1262,28 +1262,301 @@ a.db-row:hover .db-row-id {
   font-size: 0.8125rem;
 }
 
-.compare-facts {
-  margin-top: 0;
+.compare-head .db-lede {
+  max-width: 41.5rem;
 }
 
-.row-points {
-  display: grid;
-  gap: 0;
+.compare {
+  --section-space: clamp(56px, 6vw, 88px);
+  margin-top: 56px;
+}
+
+.faq-item p {
+  max-width: 46rem;
+}
+
+.faq-question {
+  display: inline;
+  margin: 0;
+  font: inherit;
+}
+
+.feature-text h2 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.feature-points a {
+  color: var(--ink);
+}
+
+.entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.entry-head .mono {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.entry-genotypes {
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--rule);
   list-style: none;
 }
 
-.row-points li {
-  padding: 14px 0;
+.entry-genotypes li {
+  display: grid;
+  grid-template-columns: 52px 82px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
   border-bottom: 1px solid var(--rule);
-  font-size: 0.9375rem;
-  line-height: 1.55;
 }
 
-.row-points strong {
-  font-weight: 600;
+.entry-genotypes li:last-child {
+  border-bottom: 0;
+}
+
+.entry-genotypes .pair {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+}
+
+.entry-summary {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.devtools {
+  padding: 0;
+  overflow: hidden;
+  font-size: 0.8125rem;
+}
+
+.devtools-tabs,
+.devtools-filters,
+.devtools-status {
+  display: flex;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.devtools-tabs {
+  gap: 18px;
+  background: color-mix(in srgb, var(--sunken) 45%, var(--surface));
+}
+
+.devtools-tabs span {
+  padding: 9px 0 8px;
+  border-bottom: 2px solid transparent;
+}
+
+.devtools-tabs .is-active {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.devtools-filters {
+  gap: 6px;
+  padding-block: 8px;
+}
+
+.devtools-filters span {
+  padding: 2px 8px;
+  border-radius: var(--radius-small);
+}
+
+.devtools-filters .is-active {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.devtools-filters .devtools-record {
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--bad);
+}
+
+.devtools-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.devtools-table th,
+.devtools-table td {
+  padding: 7px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.devtools-table th {
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.devtools-table td:first-child {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.devtools-table td {
+  color: var(--muted);
+}
+
+.devtools-table .mono {
+  color: var(--ink);
+  font-size: 0.78rem;
+}
+
+.devtools-table tbody tr:nth-child(even) {
+  background: var(--paper);
+}
+
+.devtools-status {
+  gap: 6px 18px;
+  padding-block: 9px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 0;
+  background: color-mix(in srgb, var(--sunken) 45%, var(--surface));
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.repo-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.repo-head .mono {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.repo-files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.repo-files li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.repo-files li:last-child {
+  border-bottom: 0;
+}
+
+.repo-files .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+
+.repo-path {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.repo-note {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report-grid li {
+  padding: 20px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.report-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.report-grid .report-grid-title {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+@media (max-width: 520px) {
+  .entry-genotypes li {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    gap: 6px 12px;
+  }
+
+  .entry-genotypes .repute {
+    justify-self: end;
+  }
+
+  .entry-summary {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .devtools-table th:nth-child(3),
+  .devtools-table td:nth-child(3) {
+    display: none;
+  }
+
+  .repo-files li {
+    grid-template-columns: 16px minmax(0, 1fr);
+    gap: 2px 12px;
+  }
+
+  .repo-note {
+    grid-column: 2;
+    text-align: left;
+    white-space: normal;
+  }
 }
 
 .faq {

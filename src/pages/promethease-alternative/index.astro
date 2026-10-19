@@ -3,55 +3,163 @@ import Base from '../../layouts/Base.astro'
 import CheckBand from '../../components/db/CheckBand.astro'
 import { formatDate } from '../../lib/report'
 import { loadCatalog } from '../../lib/catalog'
+import { Magnitude, Pair, ReputeTag } from '../../components/ui'
 
 const catalog = loadCatalog()
 const snapshot = formatDate(catalog.snapshotAt)
-const questions: Array<[string, string]> = [
-  ['Does Twofold use the same data as Promethease?', `Both are built on SNPedia, the community wiki of SNPs and genotypes. Twofold reads a snapshot of SNPedia taken ${snapshot}, so some entries may differ from what other SNPedia-based reports show.`],
-  ['Is Twofold free?', 'Yes. There is no fee, no account and no subscription, and the source code is public on GitHub.'],
-  ['Is my DNA file uploaded?', 'No. Twofold reads your file in a Web Worker inside your browser. The site has no upload endpoint, and after your first visit it works offline.'],
-  ['Which raw data files work?', 'Files from 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA and Living DNA, plus VCF files from whole genome sequencing. ZIP and GZ files can be opened without unzipping them first.'],
-  ['Can I keep my report?', 'You can save an encrypted copy in your browser with a passphrase, export your findings as CSV or JSON, or print the report.'],
-  ['Is the report a diagnosis?', 'No. SNPedia is community-edited and its entries can be incomplete or wrong. Important findings should be confirmed with a clinical test.']
+const count = (value: number) => value.toLocaleString('en-US')
+const requests: Array<[string, string]> = [
+  ['report/', 'document'],
+  ['index.css', 'stylesheet'],
+  ['App.js', 'script'],
+  ['report.worker.js', 'script'],
+  ['core.json', 'fetch'],
+  ['newsreader-latin-wght-normal.woff2', 'font'],
+  ['schibsted-grotesk-latin-400-normal.woff2', 'font']
 ]
+const example = catalog.snps.find(entry => entry.snp.rsid === 'rs1801133')?.snp
+const files: Array<[string, string]> = [
+  ['src/lib/file.ts', 'Reads your raw data file, line by line'],
+  ['src/workers/report.worker.ts', 'Builds your report in a Web Worker'],
+  ['src/lib/engine.ts', 'Matches your genotypes with SNPedia'],
+  ['src/lib/storage.ts', 'Encrypts a saved report with AES-GCM'],
+  ['tests/e2e/privacy.spec.ts', 'Checks the report works offline']
+]
+const report: Array<[string, string]> = [
+  ['Ranked findings', 'Every match between your file and SNPedia, sorted by magnitude, with filters for repute, chromosome, topic and rare variants.'],
+  ['Topics', 'Findings grouped by gene, condition and medicine, so you can follow one subject through your data.'],
+  ['Genosets', 'Combinations of genotypes that SNPedia reads together, checked against your whole file.'],
+  ['Strand handling', "Letters from 23andMe and AncestryDNA files are matched to SNPedia's orientation, including SNPs SNPedia lists on the minus strand."],
+  ['A public SNP database', 'Every notable SNP has its own page in Explore, so you can read about a variant before or after you open your file.']
+]
+const questions: Array<[string, string]> = [
+  ['Does Twofold use the same data as Promethease?', `Both Twofold and Promethease are built on SNPedia, the community-edited wiki that describes SNPs and what each genotype means. Twofold reads a snapshot of SNPedia taken ${snapshot}, covering ${count(catalog.genotypeCount)} genotypes across ${count(catalog.recordCount)} SNPs, plus ${count(catalog.genosetCount)} genosets. SNPedia keeps changing, so a few entries may differ from what other SNPedia-based reports show.`],
+  ['Can I use the raw data file I used with Promethease?', 'Yes. Twofold reads the raw data file you download from your testing service, the same kind of file Promethease uses. If you no longer have it, you can download it again from 23andMe, AncestryDNA, MyHeritage or your other provider.'],
+  ['Is Twofold really free?', 'Yes. Twofold costs nothing to use, with no account, no subscription and no limit on how many files you open. It is an independent, open source project, and you can support it with a donation if you find it useful.'],
+  ['Is my DNA file uploaded anywhere?', 'No. Twofold reads your file in a Web Worker inside your browser and builds the report on your own device. The site has no upload endpoint, and the only thing your browser fetches from it is the app and the same SNPedia reference data every visitor gets. After your first complete visit it works offline. The privacy page explains how to check this yourself in your browser.'],
+  ['Which raw data files work with Twofold?', 'Twofold reads raw data from 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA and Living DNA, plus VCF files from whole genome sequencing. You can open the file exactly as you downloaded it, including ZIP and GZ archives, without unzipping it first.'],
+  ['Can I save or export my report?', 'Reports stay in memory by default and are cleared when you close the tab. You can save an encrypted copy in your browser, protected by a passphrase, export your findings as CSV or JSON, or print the report and save it as a PDF. Your raw file itself is never saved.'],
+  ['Is a Twofold report a medical diagnosis?', "No. SNPedia is community-edited, so its entries can be incomplete, out of date or wrong, and its magnitude is a rating of interest rather than a risk score. Consumer DNA tests can also misreport very rare variants. Talk to a doctor or genetic counselor, and confirm important findings with a clinical test before acting on them."]
+]
+const faq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: questions.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } }))
+}
 ---
-<Base title="Free Promethease alternative: private SNPedia report | Twofold" description="Twofold is a free, open source alternative to Promethease. It explains your 23andMe, AncestryDNA or MyHeritage raw data with SNPedia, entirely in your browser." type="article">
+<Base jsonLd={[faq]} title="Free Promethease alternative: private SNPedia report | Twofold" description="Twofold is a free, open source alternative to Promethease. It explains your 23andMe, AncestryDNA or MyHeritage raw data with SNPedia, entirely in your browser." type="article">
   <main class="db" id="main">
-    <header class="db-head explore-head">
-      <h1>A free, private Promethease alternative</h1>
-      <p class="db-lede">Promethease builds DNA reports from SNPedia. Twofold reads the same kind of raw data file and explains it with SNPedia too, but it is free, open source and runs entirely in your browser, so your DNA file never leaves your device.</p>
+    <header class="db-head explore-head compare-head">
+      <h1>A Free Promethease Alternative</h1>
+      <p class="db-lede">Twofold explains your raw DNA data with SNPedia, the same source Promethease uses. It's free, open source and runs entirely in your browser, so your file never leaves your device.</p>
     </header>
 
-    <CheckBand title="Try it with your own file" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding. Your file is processed in your browser and never uploaded." />
+    <section class="compare" aria-label="How Twofold compares">
+      <div class="feature">
+        <div class="feature-text">
+          <h2>Built on the same SNPedia entries</h2>
+          <p>Twofold matches your genotypes against SNPedia, the community wiki of SNPs and what each genotype means. It reads a snapshot taken {snapshot}, so a few entries may differ from other SNPedia-based reports.</p>
+          <ul class="feature-points">
+            <li>{count(catalog.genotypeCount)} genotypes</li>
+            <li>{count(catalog.recordCount)} SNPs</li>
+            <li>{count(catalog.genosetCount)} genosets</li>
+          </ul>
+        </div>
+        {example && (
+          <div class="stage" aria-hidden="true">
+            <div class="stage-card entry-card">
+              <div class="entry-head">
+                <span class="mono">{example.rsid}</span>
+                <span class="preview-gene">{example.gene}</span>
+              </div>
+              <ul class="entry-genotypes">
+                {example.genotypes.map(genotype => (
+                  <li>
+                    <Pair alleles={genotype.alleles} />
+                    <Magnitude value={genotype.magnitude} />
+                    <span class="entry-summary">{genotype.summary}</span>
+                    <ReputeTag repute={genotype.repute} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
 
-    <section class="db-section" aria-labelledby="compare-title">
-      <div class="db-section-head"><h2 id="compare-title">What Twofold does</h2></div>
-      <dl class="db-facts compare-facts">
-        <div><dt>Price</dt><dd>Free<span class="db-facts-sub">No account or subscription</span></dd></div>
-        <div><dt>Where your file goes</dt><dd>Nowhere<span class="db-facts-sub">Read in your browser, never uploaded</span></dd></div>
-        <div><dt>Data</dt><dd>SNPedia<span class="db-facts-sub">Snapshot taken {snapshot}</span></dd></div>
-        <div><dt>Source code</dt><dd><a href="https://github.com/brandonsaldan/twofold">Open source</a><span class="db-facts-sub">Read or audit it on GitHub</span></dd></div>
-        <div><dt>Coverage</dt><dd>{catalog.genotypeCount.toLocaleString('en-US')} genotypes<span class="db-facts-sub">Across {catalog.recordCount.toLocaleString('en-US')} SNPs, plus {catalog.genosetCount.toLocaleString('en-US')} genosets</span></dd></div>
-      </dl>
+      <div class="feature feature-reverse">
+        <div class="feature-text">
+          <h2>Your file never leaves your browser</h2>
+          <p>Your raw data is read by a Web Worker on your own device, and the site has nowhere to upload it. Watch your browser's Network panel while a report builds: every request fetches part of the app or its SNPedia data from Twofold's own site, and your file is never one of them.</p>
+          <ul class="feature-points">
+            <li>Works offline</li>
+            <li>No account</li>
+            <li><a href="/privacy/">How to check it yourself</a></li>
+          </ul>
+        </div>
+        <div class="stage" aria-hidden="true">
+          <div class="stage-card devtools">
+            <div class="devtools-tabs">
+              <span>Elements</span><span>Console</span><span class="is-active">Network</span>
+            </div>
+            <div class="devtools-filters">
+              <span class="devtools-record" />
+              <span class="is-active">All</span><span>Fetch/XHR</span><span>Doc</span><span>JS</span><span>Font</span>
+            </div>
+            <table class="devtools-table">
+              <thead><tr><th>Name</th><th>Method</th><th>Type</th></tr></thead>
+              <tbody>
+                {requests.map(([name, type]) => <tr><td class="mono">{name}</td><td class="mono">GET</td><td>{type}</td></tr>)}
+              </tbody>
+            </table>
+            <div class="devtools-status"><span>7 requests</span><span>All GET</span><span>1 domain</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature">
+        <div class="feature-text">
+          <h2>Free, and open to inspect</h2>
+          <p>There is no fee, no account and no subscription. The code that reads your file and builds your report is public, so you can see exactly how your data is handled instead of taking it on trust.</p>
+          <ul class="feature-points">
+            <li><a href="https://github.com/brandonsaldan/twofold">Source on GitHub</a></li>
+            <li><a href="/support/">Support the project</a></li>
+          </ul>
+        </div>
+        <div class="stage" aria-hidden="true">
+          <div class="stage-card repo-card">
+            <div class="repo-head">
+              <span class="mono">brandonsaldan/twofold</span>
+            </div>
+            <ul class="repo-files">
+              {files.map(([path, note]) => (
+                <li>
+                  <svg class="icon" viewBox="0 0 20 20" focusable="false"><path d="M5 2.5h6.5L15 6v11.5H5zM11.5 2.5V6H15" /></svg>
+                  <span class="repo-path mono">{path}</span>
+                  <span class="repo-note">{note}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="db-section" aria-labelledby="report-title">
-      <div class="db-section-head"><h2 id="report-title">The report</h2></div>
-      <ul class="row-points">
-        <li><strong>Ranked findings.</strong> Every match between your file and SNPedia, sorted by magnitude, with filters for repute, chromosome, topic and rare variants.</li>
-        <li><strong>Topics.</strong> Findings grouped by gene, condition and medicine, so you can follow one subject through your data.</li>
-        <li><strong>Genosets.</strong> Combinations of genotypes that SNPedia reads together, checked against your file.</li>
-        <li><strong>Strand handling.</strong> Letters from 23andMe and AncestryDNA files are matched to SNPedia's orientation, including SNPs SNPedia lists on the minus strand.</li>
-        <li><strong>A public SNP database.</strong> Every notable SNP has its own page in <a href="/explore/">Explore</a>, so you can read about a variant before or after you open your file.</li>
+      <div class="db-section-head"><h2 id="report-title">Inside the report</h2><p><a href="/report/">Open a sample report</a></p></div>
+      <ul class="report-grid">
+        {report.map(([title, text]) => <li><p class="report-grid-title">{title}</p><p>{text}</p></li>)}
       </ul>
     </section>
+
+    <CheckBand title="Try it with your own file" text="Load your raw data from 23andMe, AncestryDNA, MyHeritage or another test to see every notable finding. Your file is processed in your browser and never uploaded." />
 
     <section class="db-section" aria-labelledby="faq-title">
       <div class="db-section-head"><h2 id="faq-title">Questions</h2></div>
       <div class="faq">
         {questions.map(([question, answer]) => (
           <details class="faq-item">
-            <summary>{question}</summary>
+            <summary><h3 class="faq-question">{question}</h3></summary>
             <p>{answer}</p>
           </details>
         ))}
