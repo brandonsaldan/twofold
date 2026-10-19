@@ -70,8 +70,36 @@ const wordPath = 'M323.17 149.811Q323.17 158.413 328.482 162.573Q333.794 166.733
       </header>
       <slot />
       <footer class="site-footer">
-        <p class="credit">Made by <a href="https://brandonsaldan.com">Brandon Saldan</a>. Formerly GeneCodex.</p>
-        <p><a href="/explore/">Explore</a><a href="/promethease-alternative/">Promethease alternative</a><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/support/">Support</a><a href="https://github.com/brandonsaldan/twofold">GitHub</a><span>SNPedia content CC BY-NC-SA 3.0 US</span></p>
+        <div class="footer-main">
+          <div class="footer-brand">
+            <a class="brand" href="/" aria-label="Twofold home">
+              <svg class="brand-logo" viewBox="0 0 1078.037 217.346" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d={markPath} /><path fill="currentColor" d={wordPath} /></svg>
+            </a>
+            <p class="footer-tagline">Read the rest of your DNA test.</p>
+            <p class="credit">Built by <a href="https://brandonsaldan.com">Brandon Saldan</a>. Formerly GeneCodex.</p>
+          </div>
+          <nav class="footer-links" aria-label="Footer">
+            <div>
+              <p class="footer-heading">Use</p>
+              <ul>
+                <li><a href="/">Open your File</a></li>
+                <li><a href="/explore/">Explore</a></li>
+                <li><a href="/get-data/">Get your Data</a></li>
+                <li><a href="/promethease-alternative/">Promethease Alternative</a></li>
+              </ul>
+            </div>
+            <div>
+              <p class="footer-heading">Project</p>
+              <ul>
+                <li><a href="/about/">About</a></li>
+                <li><a href="/privacy/">Privacy</a></li>
+                <li><a href="/support/">Support</a></li>
+                <li><a href="https://github.com/brandonsaldan/twofold">GitHub</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+        <p class="footer-legal">SNPedia content is shared under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/us/">CC BY-NC-SA 3.0 US</a>. Twofold is not medical advice.</p>
       </footer>
     </div>
     <script>
